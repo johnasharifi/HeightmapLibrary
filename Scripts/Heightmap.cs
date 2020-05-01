@@ -2,8 +2,83 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Heightmap
+public class Heightmap
 {
+    private float[,] surface;
+
+    public Heightmap(int dim1, int dim2, float perlinScale = 1.0f)
+    {
+        dim1 = Mathf.Max(1, dim1);
+        dim2 = Mathf.Max(1, dim2);
+
+        surface = new float[dim1, dim2];
+        
+        float xoff0 = Random.Range(0.0f, 1000.0f);
+        float xoff1 = Random.Range(0.0f, 1000.0f);
+        float yoff0 = Random.Range(0.0f, 1000.0f);
+        float yoff1 = Random.Range(0.0f, 1000.0f);
+
+        // params of this function: perl offsets, scale
+        // variables: x coord, y coord
+        System.Func<int, int, float> perl = (int x, int y) =>
+        {
+            return 0.5f * Mathf.PerlinNoise((x + xoff0) * perlinScale / dim1, (y + yoff0) * perlinScale/ dim2) +
+                0.5f * Mathf.PerlinNoise((x + xoff1) * perlinScale / dim1, (y + yoff1) * perlinScale / dim2);
+        };
+
+        for (int i = 0; i < dim1; i++)
+        {
+            for (int j = 0; j < dim2; j++)
+            {
+                surface[i, j] = perl(i, j);
+            }
+        }
+    }
+
+    private int dim1
+    {
+        get { return surface.GetLength(0); }
+    }
+
+    private int dim2
+    {
+        get { return surface.GetLength(1); }
+    }
+
+    /// <summary>
+    /// Private internal accessor using integers. 
+    /// </summary>
+    /// <param name="ind1">Index 1 into surface</param>
+    /// <param name="ind2">Index 2 into surface</param>
+    /// <returns></returns>
+    private float this[int ind1, int ind2]
+    {
+        get
+        {
+            return surface[Mathf.Clamp(ind1, 0, dim1 - 1), Mathf.Clamp(ind2, 0, dim2 - 1)];
+        }
+    }
+
+    public static implicit operator Texture2D(Heightmap h)
+    {
+        Texture2D tex = new Texture2D(h.dim1, h.dim2);
+        tex.filterMode = FilterMode.Point;
+
+        for (int i = 0; i < h.dim1; i++)
+        {
+            for (int j = 0; j < h.dim2; j++)
+            {
+                tex.SetPixel(i, j, Color.Lerp(Color.white, Color.black, h[i, j]));
+            }
+        }
+
+        tex.Apply();
+        return (tex);
+    }
+
+
+
+
     /// <summary>
     /// Only returns values of sec for which values of prime are within specified range
     /// </summary>
