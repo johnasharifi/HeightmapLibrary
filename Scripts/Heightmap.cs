@@ -6,6 +6,14 @@ public class Heightmap
 {
     private float[,] surface;
 
+    /// <summary>
+    /// Creates a heightmap whose surface should be manually allocated. 
+    /// This constructor is used by Heightmap operators that have return values.
+    /// </summary>
+    private Heightmap()
+    {
+    }
+    
     public Heightmap(int dim1, int dim2, float perlinScale = 1.0f)
     {
         dim1 = Mathf.Max(1, dim1);
@@ -59,7 +67,7 @@ public class Heightmap
         }
     }
 
-    public static implicit operator Texture2D(Heightmap h)
+    public static implicit operator Texture2D (Heightmap h)
     {
         Texture2D tex = new Texture2D(h.dim1, h.dim2);
         tex.filterMode = FilterMode.Point;
@@ -76,6 +84,110 @@ public class Heightmap
         return (tex);
     }
 
+    /// <summary>
+    /// Defines Heightmap * Heightmap operation
+    /// </summary>
+    /// <param name="orig">First heightmap arg</param>
+    /// <param name="other">Second heightmap arg</param>
+    /// <returns>A new heightmap which has values far from 0.5 where orig or other had values far from 0.5</returns>
+    public static Heightmap operator * (Heightmap orig, Heightmap other)
+    {
+        Heightmap result = new Heightmap();
+        result.surface = new float[orig.dim1, orig.dim2];
+
+        for (int i = 0; i < orig.dim1; i++)
+        {
+            for (int j = 0; j < orig.dim2; j++)
+            {
+                float f1 = (orig[i, j] - 0.5f) * 2; // transform from range [0, 1] into [-1, 1]
+                float f2 = (other[i, j] - 0.5f) * 2; // transform from range [0, 1] into [-1, 1]
+                // introduce eccentricity; (f1 + f2) / 2 shifts distribution toward mean
+                // float eccentric = Mathf.Sign(f1 * f2) * Mathf.Pow(Mathf.Abs(f1 * f2), 0.5f);
+                float eccentric = Mathf.Sign(f1 * f2) * Mathf.Pow(Mathf.Abs(f1 * f2), 0.5f);
+                result.surface[i, j] = Mathf.Clamp01( (eccentric) * 0.5f + 0.5f);
+            }
+        }
+
+        return (result);
+    }
+
+    /// <summary>
+    /// Compares each member in surface array to v.
+    /// </summary>
+    /// <param name="orig">A heightmap with values in an array</param>
+    /// <param name="v">A float to compare heightmap values to</param>
+    /// <returns></returns>
+    public static bool[,] operator < (Heightmap orig, float v)
+    {
+        bool[,] orig_less_than_v = new bool[orig.dim1, orig.dim2];
+        for (int i = 0; i < orig.dim1; i++)
+        {
+            for (int j = 0; j < orig.dim2; j++)
+            {
+                orig_less_than_v[i, j] = orig[i, j] < v;
+            }
+        }
+        return (orig_less_than_v);
+    }
+
+    public static bool[,] operator <(float v, Heightmap orig)
+    {
+        // v < orig 
+        // has equivalent signs as
+        // orig > v
+        return orig > v;
+    }
+
+    public static bool[,] operator >(Heightmap orig, float v)
+    {
+        bool[,] orig_greater_than_v = new bool[orig.dim1, orig.dim2];
+        for (int i = 0; i < orig.dim1; i++)
+        {
+            for (int j = 0; j < orig.dim2; j++)
+            {
+                orig_greater_than_v[i, j] = orig[i, j] > v;
+            }
+        }
+        return (orig_greater_than_v);
+    }
+
+    public static bool[,] operator >(float v, Heightmap orig)
+    {
+        // v > orig
+        // has equivalent signs as
+        // orig < v
+        return orig < v;
+    }
+
+    /// <summary>
+    /// Zeroes out values in orig when flag is false
+    /// </summary>
+    /// <param name="flags">Array of boolean flags. Flagij == false makes heightmap value in same position zero</param>
+    /// <param name="orig"></param>
+    /// <returns></returns>
+    public static Heightmap operator &(bool[,] flags, Heightmap orig)
+    {
+        Heightmap h = new Heightmap();
+        h.surface = new float[orig.dim1, orig.dim2];
+
+        for (int i = 0; i < orig.dim1; i++)
+        {
+            for (int j = 0; j < orig.dim2; j++)
+            {
+                h.surface[i, j] = (flags[i, j]? 1:0) * orig[i, j];
+            }
+        }
+
+        return (h);
+    }
+
+    public static Heightmap operator &(Heightmap orig, bool[,] flags)
+    {
+        return flags & orig;
+    }
+
+    /// -------------
+    /// static members; TODO convert into oo
 
 
 
