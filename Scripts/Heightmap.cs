@@ -13,7 +13,13 @@ public class Heightmap
     private Heightmap()
     {
     }
-    
+
+    public Heightmap(float[,] elements)
+    {
+        surface = new float[elements.GetLength(0), elements.GetLength(1)];
+        System.Array.Copy(elements, surface, dim1 * dim2);
+    }
+
     public Heightmap(int dim1, int dim2, float perlinScale = 1.0f)
     {
         dim1 = Mathf.Max(1, dim1);
@@ -89,7 +95,7 @@ public class Heightmap
     /// </summary>
     /// <param name="orig">First heightmap arg</param>
     /// <param name="other">Second heightmap arg</param>
-    /// <returns>A new heightmap which has values far from 0.5 where orig or other had values far from 0.5</returns>
+    /// <returns>A new heightmap whose values in orig are scaled by other</returns>
     public static Heightmap operator * (Heightmap orig, Heightmap other)
     {
         Heightmap result = new Heightmap();
@@ -186,53 +192,28 @@ public class Heightmap
         return flags & orig;
     }
 
-    /// -------------
-    /// static members; TODO convert into oo
-
-
-
-    /// <summary>
-    /// Only returns values of sec for which values of prime are within specified range
-    /// </summary>
-    /// <param name="prime"></param>
-    /// <param name="sec"></param>
-    /// <returns></returns>
-    public static float[,] AndPrimaryInBin(float[,] prime, float min, float max, float[,] sec)
+    public static Heightmap operator *(Heightmap other, float[,] scale)
     {
-        int dim1 = prime.GetLength(0);
-        int dim2 = prime.GetLength(1);
-        
-        float[,] h = new float[prime.GetLength(0), prime.GetLength(1)];
+        Heightmap h = new Heightmap();
 
-        for (int i = 0; i < dim1; i++)
+        h.surface = new float[other.dim1, other.dim2];
+
+        for (int i = 0; i < h.dim1; i++)
         {
-            for (int j = 0; j < dim2; j++)
+            for (int j = 0; j < h.dim2; j++)
             {
-                h[i, j] = (min < prime[i, j] && prime[i, j] < max ? 1 : 0) * sec[i, j];
+                h.surface[i, j] = h.surface[i, j] * scale[i, j];
             }
         }
-
+        
         return (h);
     }
 
-    public static float[,] GetBlend(float[,] h1, float[,] h2, float alpha)
+    public static Heightmap operator *(float[,] scale, Heightmap other)
     {
-        int dim1 = h1.GetLength(0);
-        int dim2 = h1.GetLength(1);
-
-        float[,] h3 = new float[dim1, dim2];
-
-        for (int i = 0; i < dim1; i++)
-        {
-            for (int j = 0; j < dim2; j++)
-            {
-                h3[i, j] = Mathf.Lerp(h1[i,j], h2[i,j], alpha);
-            }
-        }
-
-        return (h3);
+        return other * scale;
     }
-
+    
     public static float[,] GetExteriorWeight(int dim1, int dim2)
     {
         float[,] h = new float[dim1, dim2];
@@ -247,67 +228,25 @@ public class Heightmap
         {
             for (int j = 0; j < dim2; j++)
             {
-                h[i, j] = rad(i, j);
+                h[i, j] = 1.0f - rad(i, j);
             }
         }
 
         return (h);
     }
 
-    public static float[,] GetHeightmap(int dim1, int dim2, float perlinScale = 1.0f)
+    public static Heightmap Blend(Heightmap h1, Heightmap h2, float[,] alpha)
     {
-        return GetHeightmap(dim1, dim2, new float[] {perlinScale});
-    }
+        Heightmap h = new Heightmap(h1.dim1, h1.dim2);
 
-    public static float[,] GetHeightmap(int dim1, int dim2, params float[] perlinScales)
-    {
-        float[,] h = new float[dim1, dim2];
-
-        float xoff0 = Random.value * 1000.0f;
-        float yoff0 = Random.value * 1000.0f;
-        float xoff1 = Random.value * 1000.0f;
-        float yoff1 = Random.value * 1000.0f;
-
-        System.Func<float, float, int, float> perl = (float x, float y, int scaleInd) =>
+        for (int i = 0; i < h.dim1; i++)
         {
-            return 0.5f * Mathf.PerlinNoise((x + xoff0) * perlinScales[scaleInd] / dim1, (y + yoff0) * perlinScales[scaleInd] / dim2) +
-                0.5f * Mathf.PerlinNoise((x + xoff1) * perlinScales[scaleInd] / dim1, (y + yoff1) * perlinScales[scaleInd] / dim2); 
-        };
-
-        for (int i = 0; i < dim1; i++)
-        {
-            for (int j = 0; j < dim2; j++)
+            for (int j = 0; j < h.dim2; j++)
             {
-                float val = 0.0f;
-                for (int k = 0; k < perlinScales.Length; k++)
-                {
-                    val += perl(i, j, k) / perlinScales.Length;
-                }
-                h[i, j] = val;
+                h.surface[i, j] = Mathf.Lerp(h1[i,j], h2[i,j], alpha[i,j]);
             }
         }
 
         return (h);
     }
-
-    public static Texture2D GetTexture(float[,] heightmap)
-    {
-        int x = heightmap.GetLength(0);
-        int y = heightmap.GetLength(1);
-
-        Texture2D tex = new Texture2D(heightmap.GetLength(0), heightmap.GetLength(1));
-
-        for (int i = 0; i < x; i++)
-        {
-            for (int j = 0; j < y; j++)
-            {
-                tex.SetPixel(i, j, Color.Lerp(Color.red, Color.green, heightmap[i,j]));
-            }
-        }
-
-        tex.Apply();
-
-        return (tex);
-    }
-
 }
