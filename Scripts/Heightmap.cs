@@ -65,12 +65,19 @@ public class Heightmap
     /// <param name="ind1">Index 1 into surface</param>
     /// <param name="ind2">Index 2 into surface</param>
     /// <returns></returns>
-    private float this[int ind1, int ind2]
+    public float this[int ind1, int ind2]
     {
         get
         {
             return surface[Mathf.Clamp(ind1, 0, dim1 - 1), Mathf.Clamp(ind2, 0, dim2 - 1)];
         }
+    }
+
+    public static explicit operator float[,] (Heightmap h)
+    {
+        float[,] data = new float[h.dim1, h.dim2];
+        System.Array.Copy(h.surface, data, h.dim1 * h.dim2);
+        return (data);
     }
 
     public static implicit operator Texture2D (Heightmap h)
