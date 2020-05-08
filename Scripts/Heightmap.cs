@@ -238,4 +238,19 @@ public class Heightmap
 
         return (h);
     }
+
+    public static bool[,] AND(bool[,] flag1, bool[,] flag2)
+    {
+        bool[,] data = new bool[flag1.GetLength(0), flag1.GetLength(1)];
+
+        for (int i = 0; i < flag1.GetLength(0); i++)
+        {
+            for (int j = 0; j < flag2.GetLength(1); j++)
+            {
+                data[i, j] = flag1[i, j] && flag2[i, j];
+            }
+        }
+
+        return (data);
+    }
 }
