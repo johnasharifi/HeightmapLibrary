@@ -49,7 +49,7 @@ public class HeightmapToTexture : MonoBehaviour
                     tex_map.SetPixel(i, j, Color.white);
                 else if (!(0.4f < lattice[i, j] && lattice[i, j] < 0.5f) && 0.4f < combined_radial[i, j])
                     tex_map.SetPixel(i, j, Color.red);
-                else if (0.25f < surface3[i, j] && surface3[i, j] < 0.45f)
+                else if (0.35f < surface3[i, j] && surface3[i, j] < 0.45f)
                     tex_map.SetPixel(i, j, Color.green);
                 else if (0.50f < surface3[i, j] && surface3[i, j] < 0.55f)
                     tex_map.SetPixel(i, j, Color.yellow);
