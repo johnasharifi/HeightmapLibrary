@@ -73,6 +73,11 @@ public class Heightmap
         }
     }
 
+    /// <summary>
+    /// Heightmaps support retrieval of contained float data.
+    /// Useful for retrieving an array of alpha data in range [0 - 1]
+    /// </summary>
+    /// <param name="h">A heightmap which contains float[,] data</param>
     public static explicit operator float[,] (Heightmap h)
     {
         float[,] data = new float[h.dim1, h.dim2];
@@ -80,7 +85,11 @@ public class Heightmap
         return (data);
     }
 
-    public static implicit operator Texture2D (Heightmap h)
+    /// <summary>
+    /// Heightmaps support converesion into Texture2Ds.
+    /// </summary>
+    /// <param name="h">A heightmap to convert to grayscale bmp</param>
+    public static explicit operator Texture2D (Heightmap h)
     {
         Texture2D tex = new Texture2D(h.dim1, h.dim2);
         tex.filterMode = FilterMode.Point;
@@ -95,33 +104,6 @@ public class Heightmap
 
         tex.Apply();
         return (tex);
-    }
-
-    /// <summary>
-    /// Defines Heightmap * Heightmap operation
-    /// </summary>
-    /// <param name="orig">First heightmap arg</param>
-    /// <param name="other">Second heightmap arg</param>
-    /// <returns>A new heightmap whose values in orig are scaled by other</returns>
-    public static Heightmap operator * (Heightmap orig, Heightmap other)
-    {
-        Heightmap result = new Heightmap();
-        result.surface = new float[orig.dim1, orig.dim2];
-
-        for (int i = 0; i < orig.dim1; i++)
-        {
-            for (int j = 0; j < orig.dim2; j++)
-            {
-                float f1 = (orig[i, j] - 0.5f) * 2; // transform from range [0, 1] into [-1, 1]
-                float f2 = (other[i, j] - 0.5f) * 2; // transform from range [0, 1] into [-1, 1]
-                // introduce eccentricity; (f1 + f2) / 2 shifts distribution toward mean
-                // float eccentric = Mathf.Sign(f1 * f2) * Mathf.Pow(Mathf.Abs(f1 * f2), 0.5f);
-                float eccentric = Mathf.Sign(f1 * f2) * Mathf.Pow(Mathf.Abs(f1 * f2), 0.5f);
-                result.surface[i, j] = Mathf.Clamp01( (eccentric) * 0.5f + 0.5f);
-            }
-        }
-
-        return (result);
     }
 
     /// <summary>
@@ -241,7 +223,7 @@ public class Heightmap
 
         return (h);
     }
-
+    
     public static Heightmap Blend(Heightmap h1, Heightmap h2, float[,] alpha)
     {
         Heightmap h = new Heightmap(h1.dim1, h1.dim2);
