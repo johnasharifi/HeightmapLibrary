@@ -7,56 +7,54 @@ using UnityEngine;
 /// </summary>
 public class HeightmapToTexture : MonoBehaviour
 {
+    [SerializeField] private MeshRenderer mr1;
+    [SerializeField] private MeshRenderer mr2;
+    [SerializeField] private MeshRenderer mr3;
+
     // Start is called before the first frame update
     void Start()
     {
         const int dim = 128;
+
+        Heightmap rivers = new Heightmap(dim, dim, 1.0f);
+
+        Heightmap surface1 = new Heightmap(dim, dim, 2.0f);
+        float[,] surface_alpha = (float[,])new Heightmap(dim, dim);
+        Heightmap surface3 = Heightmap.Blend(surface1, rivers, surface_alpha);
         
-        float[,] height = Heightmap.GetHeightmap(dim, dim, 10.0f);
-        float[,] rivers = Heightmap.GetHeightmap(dim, dim, 2.0f);
-        float[,] fertility = Heightmap.AndPrimaryInBin(rivers, 0.4f, 0.5f, rivers);
-        float[,] paths = Heightmap.GetHeightmap(dim, dim, 10.0f);
+        rivers = rivers & (0.40f < rivers) & (rivers < 0.45f);
+        Texture2D tex = (Texture2D)rivers;
+        mr1.material.mainTexture = tex;
 
-        float[,] rad1 = Heightmap.GetExteriorWeight(dim, dim);
-        float[,] boundary = Heightmap.GetBlend(height, rad1, 0.3f);
+        Heightmap exterior = new Heightmap(Heightmap.GetExteriorWeight(dim, dim));
+        Heightmap interior = new Heightmap(dim, dim, 10.0f);
+        float[,] alpha = Heightmap.GetExteriorWeight(dim, dim);
+        Heightmap combined_radial = Heightmap.Blend(exterior, interior, alpha);
 
-        float[,] lowfreq = Heightmap.GetHeightmap(dim, dim, 5.0f);
-        float[,] highfreq = Heightmap.GetHeightmap(dim, dim, 20.0f);
-        float[,] composite = Heightmap.GetBlend(lowfreq, highfreq, 0.3f);
+        Heightmap lattice = new Heightmap(dim, dim, 10.0f);
+        lattice = lattice & (0.4f < lattice) & (lattice < 0.5f);
 
-        float[,] resources = Heightmap.GetHeightmap(dim, dim, 10.0f);
+        mr2.material.mainTexture = (Texture2D) combined_radial;
 
-        Texture2D tex = new Texture2D(dim, dim);
-        
+        Texture2D tex_map = new Texture2D(dim, dim);
         for (int i = 0; i < dim; i++)
         {
             for (int j = 0; j < dim; j++)
             {
-                if (0.4f < rivers[i, j] && rivers[i, j] < 0.45f)
-                    tex.SetPixel(i, j, Color.blue);
-                else if (0.4f < paths[i, j] && paths[i, j] < 0.5f)
-                    tex.SetPixel(i, j, Color.white);
-                else if (0.0f < fertility[i,j] && fertility[i,j] < 1.0f)
-                    tex.SetPixel(i, j, Color.green);
-                else if (boundary[i, j] < 0.5f)
-                    tex.SetPixel(i, j, Color.black);
-                else if (0.5f < composite[i, j] && composite[i, j] < 0.9f)
-                    tex.SetPixel(i, j, Color.red);
-                else if (0.5f < resources[i, j] && resources[i, j] < 0.6f)
-                    tex.SetPixel(i, j, Color.yellow);
+                if (0.40f < rivers[i, j] && rivers[i, j] < 0.42f)
+                    tex_map.SetPixel(i, j, Color.blue);
+                else if (0.4f < lattice[i, j] && lattice[i, j] < 0.5f)
+                    tex_map.SetPixel(i, j, Color.white);
+                else if (!(0.4f < lattice[i, j] && lattice[i, j] < 0.5f) && 0.4f < combined_radial[i, j])
+                    tex_map.SetPixel(i, j, Color.red);
+                else if (0.30f < surface3[i, j] && surface3[i, j] < 0.40f)
+                    tex_map.SetPixel(i, j, Color.green);
                 else
-                    tex.SetPixel(i, j, Color.white);
+                    tex_map.SetPixel(i, j, Color.white);
             }
         }
-
-        tex.filterMode = FilterMode.Point;
-        tex.Apply();
-
-        GetComponent<Renderer>().material.mainTexture = tex;
-
-        Heightmap h = new Heightmap(100, 100, 10);
-        Texture2D tex2 = h;
-        GetComponent<Renderer>().material.mainTexture = tex2;
+        tex_map.Apply();
+        mr3.material.mainTexture = tex_map;   
     }
 
     // Update is called once per frame
