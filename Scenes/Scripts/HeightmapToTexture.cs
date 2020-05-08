@@ -34,6 +34,8 @@ public class HeightmapToTexture : MonoBehaviour
         Heightmap lattice = new Heightmap(dim, dim, 10.0f);
         lattice = lattice & (0.4f < lattice) & (lattice < 0.5f);
 
+        Heightmap minerals = new Heightmap(dim, dim, 10.0f);
+
         mr2.material.mainTexture = (Texture2D) combined_radial;
 
         Texture2D tex_map = new Texture2D(dim, dim);
@@ -47,8 +49,14 @@ public class HeightmapToTexture : MonoBehaviour
                     tex_map.SetPixel(i, j, Color.white);
                 else if (!(0.4f < lattice[i, j] && lattice[i, j] < 0.5f) && 0.4f < combined_radial[i, j])
                     tex_map.SetPixel(i, j, Color.red);
-                else if (0.30f < surface3[i, j] && surface3[i, j] < 0.40f)
+                else if (0.25f < surface3[i, j] && surface3[i, j] < 0.45f)
                     tex_map.SetPixel(i, j, Color.green);
+                else if (0.50f < surface3[i, j] && surface3[i, j] < 0.55f)
+                    tex_map.SetPixel(i, j, Color.yellow);
+                else if (0.30f < minerals[i, j] && minerals[i, j] < 0.40f)
+                    tex_map.SetPixel(i, j, Color.grey);
+                else if (0.6f < minerals[i, j] && minerals[i, j] < 0.70f)
+                    tex_map.SetPixel(i, j, Color.black);
                 else
                     tex_map.SetPixel(i, j, Color.white);
             }
