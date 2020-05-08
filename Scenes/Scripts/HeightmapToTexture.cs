@@ -61,6 +61,7 @@ public class HeightmapToTexture : MonoBehaviour
                     tex_map.SetPixel(i, j, Color.white);
             }
         }
+        tex_map.filterMode = FilterMode.Point;
         tex_map.Apply();
         mr3.material.mainTexture = tex_map;   
     }
