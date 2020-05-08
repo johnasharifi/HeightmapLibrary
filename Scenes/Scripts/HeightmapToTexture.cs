@@ -53,6 +53,10 @@ public class HeightmapToTexture : MonoBehaviour
         tex.Apply();
 
         GetComponent<Renderer>().material.mainTexture = tex;
+
+        Heightmap h = new Heightmap(100, 100, 10);
+        Texture2D tex2 = h;
+        GetComponent<Renderer>().material.mainTexture = tex2;
     }
 
     // Update is called once per frame
