@@ -34,14 +34,14 @@ public class HeightmapWorld : MonoBehaviour
         Heightmap lattice = new Heightmap(scale, scale, 10.0f);
         bool[,] isLattice = Heightmap.AND(0.40f < lattice, lattice < 0.50f);
 
-        Heightmap bounder = new Heightmap(scale, scale, 10);
+        Heightmap binForest = new Heightmap(scale, scale, 10);
         Heightmap binPlains = new Heightmap(scale, scale, 1);
         Heightmap binMountain = new Heightmap(scale, scale, 2);
 
         Heightmap minerals = new Heightmap(scale, scale, 10.0f);
-        bool[,] isForest = Heightmap.AND(Heightmap.AND(0.0f < minerals, minerals < 0.5f), Heightmap.AND(0.5f < bounder, bounder < 0.7f));
-        bool[,] isPlains = Heightmap.AND(Heightmap.AND(0.4f < minerals, minerals < 0.6f), Heightmap.AND(0.3f < binPlains, binPlains < 0.5f));
-        bool[,] isMountain = Heightmap.AND(Heightmap.AND(0.5f < minerals, minerals < 0.6f), Heightmap.AND(0.4f < binMountain, binMountain < 0.5f));
+        bool[,] isForest = Heightmap.AND(Heightmap.AND(0.0f < minerals, minerals < 0.5f), Heightmap.AND(0.4f < binForest, binForest < 0.5f));
+        bool[,] isPlains = Heightmap.AND(Heightmap.AND(0.4f < minerals, minerals < 0.6f), Heightmap.AND(0.4f < binPlains, binPlains < 0.5f));
+        bool[,] isMountain = Heightmap.AND(Heightmap.AND(0.4f < minerals, minerals < 0.6f), Heightmap.AND(0.4f < binMountain, binMountain < 0.5f));
         
         Texture2D tex = (Texture2D)h;
 
