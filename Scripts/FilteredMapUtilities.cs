@@ -2,6 +2,18 @@
 
 public static class FilterMapFactory
 {
+    public static System.Func<int, int, bool> GetPerlinBand(int dim0, int dim1, float perlinScale, float threshold_a, float threshold_b)
+    {
+        System.Func<int, int, float> perlSurface = GetPerlinSurface(dim0, dim1, perlinScale);
+        System.Func<int, int, bool> predicate = (int x, int y) =>
+        {
+            float surf_xy = perlSurface(x, y);
+            return threshold_a < surf_xy && surf_xy < threshold_b;
+        };
+
+        return (predicate);
+    }
+
     public static System.Func<int, int, bool> GetPerlinFilter(int dim0, int dim1, float perlinScale, float threshold)
     {
         System.Func<int, int, float> perlSurface = GetPerlinSurface(dim0, dim1, perlinScale);
