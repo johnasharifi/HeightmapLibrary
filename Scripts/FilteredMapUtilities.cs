@@ -28,15 +28,18 @@ public static class FilterMapFactory
         return (rad);
     }
 
-    public static System.Func<int, int, float> GetPerlinSurface(int dim0, int dim1, float perlinScale)
+    private static System.Func<int, int, float> GetPerlinSurface(int dim0, int dim1, float perlinScale)
     {
         // params: dims, perlinScale, threshold, xy offsets
-        float xoff = Random.Range(0f, 1000f);
-        float yoff = Random.Range(0f, 1000f);
+        float xoff0 = Random.Range(0f, 1000f);
+        float yoff0 = Random.Range(0f, 1000f);
+        float xoff1 = Random.Range(0f, 1000f);
+        float yoff1 = Random.Range(0f, 1000f);
 
         System.Func<int, int, float> filter = (int i, int j) =>
         {
-            return Mathf.PerlinNoise(i * perlinScale/ dim0 + xoff, j * perlinScale / dim1 + yoff);
+            return  0.5f * Mathf.PerlinNoise(i * perlinScale/ dim0 + xoff0, j * perlinScale / dim1 + yoff0) +
+                    0.5f * Mathf.PerlinNoise(i * perlinScale / dim0 + xoff1, j * perlinScale / dim1 + yoff1);
         };
 
         return filter;
