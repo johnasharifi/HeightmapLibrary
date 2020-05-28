@@ -12,14 +12,14 @@ public class FilteredMapToBins : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        FilteredMap map = new FilteredMap(dims, dims);
+        Heightmap map = new Heightmap(dims, dims);
 
-        var filter_water = FilterMapFactory.GetPerlinBand(dims, dims, 1.0f, 0.4f, 0.43f);
-        var filter_exterior = FilterMapFactory.GetBlendedExteriorWeight(dims, dims, 0.5f);
-        var filter_lattice = FilterMapFactory.GetPerlinBand(dims, dims, 5.0f, 0.4f, 0.5f);
-        var filter_plains = FilterMapFactory.GetPerlinBand(dims, dims, 5.0f, 0.4f, 0.5f);
-        var filter_forests = FilterMapFactory.GetPerlinBand(dims, dims, 5.0f, 0.4f, 0.5f);
-        var filter_mountains = FilterMapFactory.GetPerlinBand(dims, dims, 5.0f, 0.4f, 0.5f);
+        var filter_water = MapFilterFactory.GetPerlinBand(dims, dims, 1.0f, 0.4f, 0.43f);
+        var filter_exterior = MapFilterFactory.GetBlendedExteriorWeight(dims, dims, 0.5f);
+        var filter_lattice = MapFilterFactory.GetPerlinBand(dims, dims, 5.0f, 0.4f, 0.5f);
+        var filter_plains = MapFilterFactory.GetPerlinBand(dims, dims, 5.0f, 0.4f, 0.5f);
+        var filter_forests = MapFilterFactory.GetPerlinBand(dims, dims, 5.0f, 0.4f, 0.5f);
+        var filter_mountains = MapFilterFactory.GetPerlinBand(dims, dims, 5.0f, 0.4f, 0.5f);
 
         map.MapFromTo(-1, 5, -1, filter_water);
         map.MapFromTo(-1, 10, 1, filter_lattice);

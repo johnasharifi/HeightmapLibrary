@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public static class FilterMapFactory
+public static class MapFilterFactory
 {
     public static System.Func<int, int, bool> GetPerlinBand(int dim0, int dim1, float perlinScale, float threshold_a, float threshold_b)
     {
