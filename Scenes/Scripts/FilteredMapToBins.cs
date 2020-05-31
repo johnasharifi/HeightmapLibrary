@@ -28,44 +28,21 @@ public class FilteredMapToBins : MonoBehaviour
         map.MapFromTo(1, 7, filter_plains);
         map.MapFromTo(1, 8, filter_forests);
         map.MapFromTo(1, 9, filter_mountains);
-
-        Texture2D tex = new Texture2D(dims, dims);
-        for (int i = 0; i < dims; i++)
+        
+        Dictionary<int, Color> mapping = new Dictionary<int, Color>()
         {
-            for (int j = 0; j < dims; j++)
-            {
-                int ind = map[i, j];
-                if (ind == 0)
-                {
-                    tex.SetPixel(i, j, Color.black);
-                }
-                else if (ind == 5)
-                {
-                    tex.SetPixel(i, j, Color.blue);
-                }
-                else if (ind == 7)
-                {
-                    tex.SetPixel(i, j, Color.yellow);
-                }
-                else if (ind == 8)
-                {
-                    tex.SetPixel(i, j, Color.green);
-                }
-                else if (ind == 9)
-                {
-                    tex.SetPixel(i, j, Color.red);
-                }
-                else if (ind == 10)
-                {
-                    tex.SetPixel(i, j, Color.white);
-                }
-                else
-                {
-                    tex.SetPixel(i, j, Color.white);
-                }
+            { 0, Color.black },
+            { 5, Color.blue },
+            { 7, Color.yellow },
+            { 8, Color.green},
+            { 9, Color.red},
+            { 10, Color.white},
+            { -1, Color.white },
+            {1, Color.white }
+        };
+        HeightmapColorLookupTable lut = new HeightmapColorLookupTable(mapping);
 
-            }
-        }
+        Texture2D tex = map.AsTexture2D(lut);
         tex.filterMode = FilterMode.Point;
         tex.Apply();
 

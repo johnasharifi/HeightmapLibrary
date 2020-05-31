@@ -113,4 +113,28 @@ public class Heightmap
             return default(int);
         }
     }
+
+    /// <summary>
+    /// Convert to Texture2D using parameter - mapping
+    /// </summary>
+    /// <param name="mapping">Specifies a mapping from integer to Color</param>
+    /// <returns>A Texture2D on GPU</returns>
+    public Texture2D AsTexture2D(HeightmapColorLookupTable mapping)
+    {
+        Texture2D tex = new Texture2D(dim1, dim2);
+        Color[] colors = new Color[dim1 * dim2];
+        
+        foreach (KeyValuePair<int, HashSet<Tuple<int,int>>> kvp in points)
+        {
+            foreach (Tuple<int,int> point in kvp.Value)
+            {
+                colors[point.Item1 * dim1 + point.Item2] = mapping[kvp.Key];
+            }
+        }
+
+        tex.SetPixels(colors);
+        
+        tex.Apply();
+        return tex;
+    }
 }
