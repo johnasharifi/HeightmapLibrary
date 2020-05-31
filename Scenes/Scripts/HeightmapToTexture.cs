@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FilteredMapToBins : MonoBehaviour
+public class HeightmapToTexture : MonoBehaviour
 {
     [SerializeField] private Renderer rend;
 
