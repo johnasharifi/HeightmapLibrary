@@ -5,8 +5,8 @@ using UnityEngine;
 public class MapSpawner : MonoBehaviour
 {
     [SerializeField] private GameObject mapEntityPrefab;
-    [Range(1.0f, 10.0f), SerializeField] private float spawnRange = 5.0f;
-    [Range(1.0f, 10.0f), SerializeField] private float spawnInterval = 5.0f;
+    [Range(1.0f, 32.0f), SerializeField] private float spawnRange = 32.0f;
+    [Range(0.01f, 10.0f), SerializeField] private float spawnInterval = 5.0f;
 
     private WaitForSeconds interval;
 
