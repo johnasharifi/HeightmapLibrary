@@ -15,7 +15,11 @@ using System.Linq;
 [RequireComponent(typeof(Collider))]
 public class MapEntity : MonoBehaviour
 {
+    [SerializeField] private HeightmapToTexture map;
+    private Vector3 spawnPosition;
+
     private Collider myCollider;
+    private Collider mapCollider;
 
     [SerializeField] private Transform target;
 
@@ -30,6 +34,10 @@ public class MapEntity : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // TODO populate these params in a more elegant way
+        spawnPosition = transform.position;
+        map = FindObjectOfType<HeightmapToTexture>();
+        mapCollider = map.gameObject.GetComponent<Collider>();
         // set random initial polarity so that doodads start out with random spin in xy plane
         transform.rotation = Quaternion.Euler(0.0f, Random.value * 360f, 0f);
         myCollider = GetComponent<Collider>();
@@ -89,12 +97,10 @@ public class MapEntity : MonoBehaviour
     {
         for (; ;)
         {
-            Collider[] adj = Physics.OverlapSphere(transform.position, acquisitionRadius);
-            IEnumerable<Collider> colliderCollection = from collider in adj
-                                                       where collider.GetComponent<MapEntity>() != null &&
-                                                       collider != myCollider
-                                                       select collider;
+            HashSet<Transform> adj = map.GetTransformsNear((int) spawnPosition.x, (int) spawnPosition.z);
 
+            IEnumerable<Collider> colliderCollection = adj.Where(x => x != null && x.GetComponent<Collider>() != myCollider && x.GetComponent<Collider>() != mapCollider).Select(x => x.GetComponent<Collider>());
+            
             if (colliderCollection != null && colliderCollection.Count() > 0)
             {
                 // obviously later we should do filtering here

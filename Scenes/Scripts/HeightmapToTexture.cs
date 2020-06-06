@@ -9,9 +9,17 @@ public class HeightmapToTexture : MonoBehaviour
     [Range(64, 512)]
     [SerializeField] private int dims;
 
+    private MapAdjacencyCache mapCache;
+
+    public HashSet<Transform> GetTransformsNear(int i, int j)
+    {
+        return mapCache[i, j];
+    }
+
     // Start is called before the first frame update
     void Start()
     {
+        mapCache = new MapAdjacencyCache(dims, dims);
         Heightmap map = new Heightmap(dims, dims);
 
         var filter_water = MapFilterFactory.GetPerlinBand(dims, dims, 1.0f, 0.4f, 0.43f);
@@ -28,7 +36,20 @@ public class HeightmapToTexture : MonoBehaviour
         map.MapFromTo(1, 9, filter_mountains);
         map.MapFromTo(1, 8, filter_forests);
         map.MapFromTo(1, 7, filter_plains);
-        
+
+        // TODO define a function of (i,j) to apply per index in collection
+        foreach (System.Tuple<int, int> point in map[7])
+        {
+            // note: xy flip here
+            Vector3 p = new Vector3(point.Item2, point.Item1);
+            GameObject go = new GameObject();
+            go.transform.SetParent(transform, true);
+            go.transform.localRotation = Quaternion.identity;
+            go.transform.localPosition = new Vector3((p.x + 0.5f - dims / 2) / transform.localScale.x, (p.y + 0.5f - dims / 2) / transform.localScale.y, 0.0f);
+            go.transform.localScale = new Vector3(1.0f / transform.localScale.x, 1.0f / transform.localScale.y, 1.0f / transform.localScale.z);
+            Collider c = go.AddComponent<BoxCollider>();
+        }
+
         Dictionary<int, Color> mapping = new Dictionary<int, Color>()
         {
             { 0, Color.red },
