@@ -15,7 +15,6 @@ using System.Linq;
 [RequireComponent(typeof(Collider))]
 public class MapEntity : MonoBehaviour
 {
-    [SerializeField] private HeightmapToTexture map;
     private Vector3 spawnPosition;
 
     private Collider myCollider;
@@ -36,8 +35,6 @@ public class MapEntity : MonoBehaviour
     {
         // TODO populate these params in a more elegant way
         spawnPosition = transform.position;
-        map = FindObjectOfType<HeightmapToTexture>();
-        mapCollider = map.gameObject.GetComponent<Collider>();
         // set random initial polarity so that doodads start out with random spin in xy plane
         transform.rotation = Quaternion.Euler(0.0f, Random.value * 360f, 0f);
         myCollider = GetComponent<Collider>();
@@ -97,7 +94,7 @@ public class MapEntity : MonoBehaviour
     {
         for (; ;)
         {
-            HashSet<Transform> adj = map.GetTransformsNear((int) spawnPosition.x, (int) spawnPosition.z);
+            HashSet<Transform> adj = MapAdjacencyCacheUtility.GetTransformsNear(transform.position);
 
             IEnumerable<Collider> colliderCollection = adj.Where(x => x != null && x.GetComponent<Collider>() != myCollider && x.GetComponent<Collider>() != mapCollider).Select(x => x.GetComponent<Collider>());
             

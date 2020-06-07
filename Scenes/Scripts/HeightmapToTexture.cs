@@ -8,18 +8,10 @@ public class HeightmapToTexture : MonoBehaviour
 
     [Range(64, 512)]
     [SerializeField] private int dims;
-
-    private MapAdjacencyCache mapCache;
-
-    public HashSet<Transform> GetTransformsNear(int i, int j)
-    {
-        return mapCache[i, j];
-    }
-
+    
     // Start is called before the first frame update
     void Start()
     {
-        mapCache = new MapAdjacencyCache(dims, dims);
         Heightmap map = new Heightmap(dims, dims);
 
         var filter_water = MapFilterFactory.GetPerlinBand(dims, dims, 1.0f, 0.4f, 0.43f);

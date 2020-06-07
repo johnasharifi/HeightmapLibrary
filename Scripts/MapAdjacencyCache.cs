@@ -8,55 +8,27 @@ using System.Linq;
 /// 
 /// Assumes the game world dims are equal to array dims.
 /// </summary>
-public class MapAdjacencyCache
+public static class MapAdjacencyCacheUtility
 {
-    private readonly HashSet<Transform>[,] collection;
-
-    public MapAdjacencyCache(int dim1, int dim2)
-    {
-        dim1 = Mathf.Max(dim1, 1);
-        dim2 = Mathf.Max(dim2, 1);
-        collection = new HashSet<Transform>[dim1, dim2];
-    }
-
-    private Collider[] GetCollidersNear(int i, int j, float radius = 10.0f)
-    {
-        Collider[] adj = Physics.OverlapSphere(new Vector3(i, 0f, j), radius);
-        return (adj);
-    }
-
-    public void Clear(int i, int j)
-    {
-        collection[i, j] = null;
-    }
+    private static readonly Dictionary<Vector3, HashSet<Transform>> collection = new Dictionary<Vector3, HashSet<Transform>>();
     
-    private HashSet<Transform> Get(int i, int j)
+    /// <summary>
+    /// Gets game colliders near point.
+    /// 
+    /// Internal, unfiltered data acquisition of colliders using physics engine.
+    /// </summary>
+    /// <param name="p">A point in space</param>
+    /// <param name="radius">a distance</param>
+    /// <returns></returns>
+    public static HashSet<Transform> GetTransformsNear(Vector3 p, float radius = 10.0f)
     {
-        i = Mathf.Clamp(i, 0, collection.GetLength(0));
-        j = Mathf.Clamp(j, 0, collection.GetLength(1));
+        Vector3 binnedP = new Vector3(Mathf.Floor(p.x), Mathf.Floor(p.y), Mathf.Floor(p.z));
+        if (!collection.ContainsKey(binnedP))
+        {
+            Collider[] adj = Physics.OverlapSphere(p, radius + Vector3.Distance(p, binnedP));
+            collection[binnedP] = new HashSet<Transform>(adj.Select(x => x.transform));
+        }
 
-        if (collection[i,j] == null)
-        {
-            try
-            {
-                Collider[] adj = GetCollidersNear(i, j);
-                collection[i, j] = new HashSet<Transform>(adj.Select(x => x.transform));
-            }
-            catch (System.Exception e)
-            {
-                collection[i, j] = null;
-            }
-        }
-        // always clear null elems from collection
-        collection[i, j].Remove(null);
-        return collection[i, j];
-    }
-    
-    public HashSet<Transform> this[int i, int j]
-    {
-        get
-        {
-            return Get(i, j);
-        }
+        return collection[binnedP];
     }
 }
