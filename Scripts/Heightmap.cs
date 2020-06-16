@@ -26,6 +26,14 @@ public class Heightmap
         }
     }
 
+    public void ApplyFunctionTo(int originClass, Action<int, int> function)
+    {
+        foreach (Tuple<int, int> point in points[originClass])
+        {
+            function(point.Item1, point.Item2);
+        }
+    }
+
     public void MapFromTo(int originClass, int targetClass, Func<int, int, bool> predicate)
     {
         MapFromTo(originClass, targetClass, originClass, predicate);
