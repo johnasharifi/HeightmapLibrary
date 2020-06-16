@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Camera))]
 public class CameraController : MonoBehaviour
 {
+    [SerializeField] private Camera myCamera;
+
     [SerializeField, Range(1, 10)]
     private float translateSpeed = 5.0f;
     [SerializeField, Range(1, 10)]
@@ -12,12 +15,24 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        myCamera = transform.GetComponent<Camera>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetMouseButtonDown(1))
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(myCamera.ScreenPointToRay(Input.mousePosition), out hit)) {
+                MapEntity entity = hit.transform.GetComponent<MapEntity>();
+                if (entity != null)
+                {
+                    Debug.LogFormat("hit entity at {0}", entity.transform.localPosition);
+                }
+            }
+        }
+
         if (Mathf.Abs(Input.mouseScrollDelta.y) > Mathf.Epsilon) {
             transform.position += -1 * zoomSpeed * Vector3.up * Input.mouseScrollDelta.y;
         }

@@ -38,6 +38,7 @@ public class HeightmapToTexture : MonoBehaviour
             go.transform.localPosition = new Vector3((p.x + 0.5f - dims / 2) / transform.localScale.x, (p.y + 0.5f - dims / 2) / transform.localScale.y, 0.0f);
             go.transform.localScale = new Vector3(1.0f / transform.localScale.x, 1.0f / transform.localScale.y, 1.0f / transform.localScale.z);
             Collider c = go.AddComponent<BoxCollider>();
+            MapEntity entity = go.AddComponent<MapEntity>();
         };
         map.ApplyFunctionTo(7, spawnMapEntitiesOnPlains);
 
