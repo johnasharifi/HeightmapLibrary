@@ -8,7 +8,7 @@ public class HeightmapToTexture : MonoBehaviour
 
     [Range(64, 512)]
     [SerializeField] private int dims;
-
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -28,7 +28,20 @@ public class HeightmapToTexture : MonoBehaviour
         map.MapFromTo(1, 9, filter_mountains);
         map.MapFromTo(1, 8, filter_forests);
         map.MapFromTo(1, 7, filter_plains);
-        
+
+        System.Action<int, int> spawnMapEntitiesOnPlains = (int i, int j) =>
+        {
+            Vector3 p = new Vector3(j, i);
+            GameObject go = new GameObject();
+            go.transform.SetParent(transform, true);
+            go.transform.localRotation = Quaternion.identity;
+            go.transform.localPosition = new Vector3((p.x + 0.5f - dims / 2) / transform.localScale.x, (p.y + 0.5f - dims / 2) / transform.localScale.y, 0.0f);
+            go.transform.localScale = new Vector3(1.0f / transform.localScale.x, 1.0f / transform.localScale.y, 1.0f / transform.localScale.z);
+            Collider c = go.AddComponent<BoxCollider>();
+            MapEntity entity = go.AddComponent<MapEntity>();
+        };
+        map.ApplyFunctionTo(7, spawnMapEntitiesOnPlains);
+
         Dictionary<int, Color> mapping = new Dictionary<int, Color>()
         {
             { 0, Color.red },
