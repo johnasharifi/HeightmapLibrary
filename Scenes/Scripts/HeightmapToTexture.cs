@@ -39,6 +39,16 @@ public class HeightmapToTexture : MonoBehaviour
             go.transform.localScale = new Vector3(1.0f / transform.localScale.x, 1.0f / transform.localScale.y, 1.0f / transform.localScale.z);
             Collider c = go.AddComponent<BoxCollider>();
             MapEntity entity = go.AddComponent<MapEntity>();
+
+            MapTicker ticker = go.AddComponent<MapTicker>();
+            int interval = Random.Range(60, 1000);
+            ticker.AddTicker(() => 
+            {
+                // TODO generate in a static stateless factory so that we do not pin a bunch of references to objects into our memory
+                GameObject subobj = new GameObject();
+                subobj.transform.position = go.transform.position;
+                Destroy(subobj, 5f);
+            }, interval);
         };
         map.ApplyFunctionTo(7, spawnMapEntitiesOnPlains);
 
