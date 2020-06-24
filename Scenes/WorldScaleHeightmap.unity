@@ -227,7 +227,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rend: {fileID: 1954758}
-  dims: 127
+  dims: 128
 --- !u!1 &736219188
 GameObject:
   m_ObjectHideFlags: 0
@@ -324,7 +324,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fea76b0a9bae704ebb9007757f76300, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myCamera: {fileID: 0}
   translateSpeed: 5
+  zoomSpeed: 5
 --- !u!1 &1371535737
 GameObject:
   m_ObjectHideFlags: 0
