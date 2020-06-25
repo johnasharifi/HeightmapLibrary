@@ -37,8 +37,19 @@ public class HeightmapToTexture : MonoBehaviour
             go.transform.localRotation = Quaternion.identity;
             go.transform.localPosition = new Vector3((p.x + 0.5f - dims / 2) / transform.localScale.x, (p.y + 0.5f - dims / 2) / transform.localScale.y, 0.0f);
             go.transform.localScale = new Vector3(1.0f / transform.localScale.x, 1.0f / transform.localScale.y, 1.0f / transform.localScale.z);
-            Collider c = go.AddComponent<BoxCollider>();
-            MapEntity entity = go.AddComponent<MapEntity>();
+
+            MapTicker ticker = go.AddComponent<MapTicker>();
+            int interval = Random.Range(60, 1000);
+            ticker.AddTicker(() => 
+            {
+                // TODO generate in a static stateless factory so that we do not pin a bunch of references to objects into our memory
+                GameObject subobj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                subobj.transform.position = go.transform.position + new Vector3(Random.value, 0f, Random.value);
+                subobj.transform.localScale = Vector3.one * 0.5f;
+                subobj.transform.SetParent(go.transform);
+                subobj.AddComponent<MapEntity>();
+                Destroy(subobj, 5f);
+            }, interval);
         };
         map.ApplyFunctionTo(7, spawnMapEntitiesOnPlains);
 

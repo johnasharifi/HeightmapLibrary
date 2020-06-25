@@ -4,17 +4,17 @@ using UnityEngine;
 using System.Linq;
 
 /// <summary>
-/// Expedient implementation of a self-organizing wandering map entity / unit.
+/// Expedient implementation of a map thing. Will contain info about properties, map position.
 /// 
-/// Units need to have colliders so they can be found by other colliders.
-/// 
-/// All MapEntities will have a lifetime by default; and will destroy themselves eventually.
-/// In editor, MapEntities will halt the self-destruction process when selected by user. This
-/// assists in debugging.
+/// MapEntities need to have colliders so they can be found by map searches.
 /// </summary>
 [RequireComponent(typeof(Collider))]
 public class MapEntity : MonoBehaviour
 {
+    private const string mapTypeKey = "RESOURCE";
+    private const string factKey = "FACTION";
+    private readonly Dictionary<string, HashSet<string>> tags = new Dictionary<string, HashSet<string>>();
+
     private Vector3 spawnLocalPosition;
 
     private Collider myCollider;
@@ -24,5 +24,36 @@ public class MapEntity : MonoBehaviour
     void Start()
     {
         spawnLocalPosition = transform.localPosition;
+    }
+
+    /// <summary>
+    /// Checks if this MapEntity is affiliated with a certain faction.
+    /// </summary>
+    /// <param name="faction">A string ID for a faction</param>
+    /// <returns>True if this map entity is positively affiliated with a faction, false if no faction or not same faction(s)</returns>
+    public bool IsFaction(string faction)
+    {
+        faction = faction.ToUpperInvariant();
+        if (!tags.ContainsKey(factKey))
+        {
+            tags[factKey] = new HashSet<string>();
+        }
+
+        return tags[factKey].Contains(faction);
+    }
+
+    /// <summary>
+    /// Adds note that this MapEntity is a type of map object. E.g. resource, unit, building, etc.
+    /// </summary>
+    /// <param name="type">Type of map doodad.</param>
+    public void AddType(string type)
+    {
+        type = type.ToUpperInvariant();
+        if (!tags.ContainsKey(mapTypeKey))
+        {
+            tags[mapTypeKey] = new HashSet<string>();
+        }
+
+        tags[mapTypeKey].Add(type);
     }
 }

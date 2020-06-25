@@ -21,14 +21,16 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButton(1))
         {
             RaycastHit hit;
             if (Physics.Raycast(myCamera.ScreenPointToRay(Input.mousePosition), out hit)) {
                 MapEntity entity = hit.transform.GetComponent<MapEntity>();
-                if (entity != null)
+                MapTicker ticker = hit.transform.GetComponent<MapTicker>();
+                if (hit.transform.gameObject != null && ticker == null && entity != null)
                 {
-                    Debug.LogFormat("hit entity at {0}", entity.transform.localPosition);
+                    Debug.LogFormat("harvested minerals. gameObject {0}", entity.gameObject.name);
+                    Destroy(entity.gameObject);
                 }
             }
         }
