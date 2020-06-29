@@ -11,8 +11,6 @@ using System.Linq;
 [RequireComponent(typeof(Collider))]
 public class MapEntity : MonoBehaviour
 {
-    private const string mapTypeKey = "RESOURCE";
-    private const string factKey = "FACTION";
     private readonly Dictionary<string, HashSet<string>> tags = new Dictionary<string, HashSet<string>>();
 
     private Vector3 spawnLocalPosition;
@@ -27,33 +25,37 @@ public class MapEntity : MonoBehaviour
     }
 
     /// <summary>
-    /// Checks if this MapEntity is affiliated with a certain faction.
+    /// Checks whether this entity has specified tag within specified tag group.
     /// </summary>
-    /// <param name="faction">A string ID for a faction</param>
-    /// <returns>True if this map entity is positively affiliated with a faction, false if no faction or not same faction(s)</returns>
-    public bool IsFaction(string faction)
+    /// <param name="group">A family of tags to search through. E.g. RESOURCE, FACTION</param>
+    /// <param name="tag">A tag to check within a tag group</param>
+    /// <returns>True tag is within group for this entity.</returns>
+    public bool IsTag(string group, string tag)
     {
-        faction = faction.ToUpperInvariant();
-        if (!tags.ContainsKey(factKey))
-        {
-            tags[factKey] = new HashSet<string>();
-        }
+        group = group.ToUpperInvariant();
+        tag = tag.ToUpperInvariant();
 
-        return tags[factKey].Contains(faction);
+        if (!tags.ContainsKey(group))
+        {
+            return false;
+        }
+        return tags[group].Contains(tag);
     }
 
     /// <summary>
     /// Adds note that this MapEntity is a type of map object. E.g. resource, unit, building, etc.
     /// </summary>
     /// <param name="type">Type of map doodad.</param>
-    public void AddType(string type)
+    public void AddTag(string group, string tag)
     {
-        type = type.ToUpperInvariant();
-        if (!tags.ContainsKey(mapTypeKey))
+        group = group.ToUpperInvariant();
+        tag = tag.ToUpperInvariant();
+        
+        if (!tags.ContainsKey(group))
         {
-            tags[mapTypeKey] = new HashSet<string>();
+            tags[group] = new HashSet<string>();
         }
 
-        tags[mapTypeKey].Add(type);
+        tags[group].Add(tag);
     }
 }

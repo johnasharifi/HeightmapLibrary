@@ -26,10 +26,9 @@ public class CameraController : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(myCamera.ScreenPointToRay(Input.mousePosition), out hit)) {
                 MapEntity entity = hit.transform.GetComponent<MapEntity>();
-                MapTicker ticker = hit.transform.GetComponent<MapTicker>();
-                if (hit.transform.gameObject != null && ticker == null && entity != null)
+
+                if (hit.transform.gameObject != null && entity != null && entity.IsTag("RESOURCE", "NUGGET"))
                 {
-                    Debug.LogFormat("harvested minerals. gameObject {0}", entity.gameObject.name);
                     Destroy(entity.gameObject);
                 }
             }
