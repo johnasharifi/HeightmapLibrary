@@ -10,8 +10,6 @@ using System.Linq;
 /// </summary>
 public static class MapAdjacencyCacheUtility
 {
-    private static readonly Dictionary<Vector3, HashSet<Transform>> collection = new Dictionary<Vector3, HashSet<Transform>>();
-    
     /// <summary>
     /// Gets game colliders near point.
     /// 
@@ -19,16 +17,11 @@ public static class MapAdjacencyCacheUtility
     /// </summary>
     /// <param name="p">A point in space</param>
     /// <param name="radius">a distance</param>
-    /// <returns></returns>
+    /// <returns>A collection of Transforms which have colliders near p</returns>
     public static HashSet<Transform> GetTransformsNear(Vector3 p, float radius = 10.0f)
     {
-        Vector3 binnedP = new Vector3(Mathf.Floor(p.x), Mathf.Floor(p.y), Mathf.Floor(p.z));
-        if (!collection.ContainsKey(binnedP))
-        {
-            Collider[] adj = Physics.OverlapSphere(p, radius + Vector3.Distance(p, binnedP));
-            collection[binnedP] = new HashSet<Transform>(adj.Select(x => x.transform));
-        }
-
-        return collection[binnedP];
+        // hopefully casting IEnum<T> to HashSet<T> is relatively fast...
+        // downstream calls will require HashSet's fast add/remove/contains; cannot use a simple IEnum
+        return (HashSet<Transform>) Physics.OverlapSphere(p, radius).Select(x=> x.transform);
     }
 }
