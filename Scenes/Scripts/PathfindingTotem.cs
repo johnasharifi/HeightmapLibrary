@@ -63,11 +63,10 @@ public class PathfindingTotem : MonoBehaviour
             Tuple<int, int> targetxz = new Tuple<int, int>(Mathf.FloorToInt(target.position.x), Mathf.FloorToInt(target.position.z));
             System.Diagnostics.Stopwatch w = new System.Diagnostics.Stopwatch();
             w.Start();
-            List<Tuple<int,int>> path = MapPathfinder.GetSlowFullPathFrom(null, origxz, targetxz);
+            List<Tuple<int,int>> path = MapPathfinder.GetSlowFullPathFrom(null, origxz, targetxz, 512);
             w.Stop();
             if (path == null || path.Count == 0)
             {
-                Debug.LogFormat("no path found within {0} msec", w.ElapsedMilliseconds);
                 lrend.enabled = false;
             }
             else
@@ -78,7 +77,7 @@ public class PathfindingTotem : MonoBehaviour
                 {
                     points[i] = new Vector3(path[i].Item1, 0f, path[i].Item2);
                 }
-                lrend.SetVertexCount(path.Count);
+                lrend.positionCount = path.Count;
                 lrend.SetPositions(points);
             }
             
