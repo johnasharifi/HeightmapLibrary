@@ -15,7 +15,7 @@ public static class MapPathfinder
 
     public static List<Tuple<int,int>> GetFastApproximateFullPathFrom(Heightmap map, Tuple<int,int> orig, Tuple<int,int> target)
     {
-        int maxDim = Mathf.Max(map.getDim(0), map.getDim(1));
+        int maxDim = map.getMaxDim();
 
         // if already know path, return path
         Tuple<int, int, int, int> p4 = new Tuple<int, int, int, int>(orig.Item1, orig.Item2, target.Item1, target.Item2);
@@ -77,7 +77,7 @@ public static class MapPathfinder
     public static List<Tuple<int,int>> GetSlowFullPathFrom(Heightmap map, Tuple<int,int> orig, Tuple<int, int> target, int cellSearchLimit = 128)
     {
         // param from $map
-        int maxDim = Mathf.Max(map.getDim(0), map.getDim(1));
+        int maxDim = map.getMaxDim();
 
         // general objective:
         // use cell grid search. BFS from $orig to $target.

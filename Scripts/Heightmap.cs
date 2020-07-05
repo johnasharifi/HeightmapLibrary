@@ -7,7 +7,7 @@ public class Heightmap
 {
     private int dim1;
     private int dim2;
-
+    
     /// <summary>
     /// Gets dimension of the map.
     /// </summary>
@@ -21,6 +21,15 @@ public class Heightmap
         }
         // easier to expand to n dimensions in future
         return dim2;
+    }
+
+    /// <summary>
+    /// Gets max dimension of map.
+    /// </summary>
+    /// <returns>Max of dim1, dim2 args which are provided on construction.</returns>
+    public int getMaxDim()
+    {
+        return Mathf.Max(dim1, dim2);
     }
 
     private Dictionary<int, HashSet<Tuple<int, int>>> points = new Dictionary<int, HashSet<Tuple<int, int>>>();
