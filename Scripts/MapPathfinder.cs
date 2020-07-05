@@ -9,13 +9,13 @@ public static class MapPathfinder
     // TODO stub; implement faster more general function later
     public static List<Tuple<int,int>> GetSlowFullPathFrom(Heightmap map, Tuple<int,int> orig, Tuple<int, int> target, int cellSearchLimit = 128)
     {
+        // param from $map
+        int maxDim = Mathf.Max(map.getDim(0), map.getDim(1));
+
         // inline function for getting cells adjacent to cell i,j in a grid
-        Func < Tuple<int, int>, IEnumerable <Tuple<int, int>>> GetAdjacent = (Tuple<int, int> p) =>
+        Func< Tuple<int, int>, IEnumerable <Tuple<int, int>>> GetAdjacent = (Tuple<int, int> p) =>
         {
             HashSet<Tuple<int, int>> items = new HashSet<Tuple<int, int>>();
-
-            // TODO convert to param later. need to retrieve from $map
-            const int maxDim = 128;
 
             HashSet<Tuple<int, int>> collection = new HashSet<Tuple<int, int>>();
             for (int i = p.Item1 - 1; i >= 0 && i < maxDim && i < p.Item1 + 2; i++)

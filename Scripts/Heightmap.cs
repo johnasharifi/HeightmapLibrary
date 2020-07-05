@@ -8,6 +8,21 @@ public class Heightmap
     private int dim1;
     private int dim2;
 
+    /// <summary>
+    /// Gets dimension of the map.
+    /// </summary>
+    /// <param name="dimension"></param>
+    /// <returns></returns>
+    public int getDim(int dimension)
+    {
+        if (dimension == 0)
+        {
+            return dim1;
+        }
+        // easier to expand to n dimensions in future
+        return dim2;
+    }
+
     private Dictionary<int, HashSet<Tuple<int, int>>> points = new Dictionary<int, HashSet<Tuple<int, int>>>();
 
     public Heightmap(int _dim1, int _dim2)

@@ -63,7 +63,7 @@ public class PathfindingTotem : MonoBehaviour
             Tuple<int, int> targetxz = new Tuple<int, int>(Mathf.FloorToInt(target.position.x), Mathf.FloorToInt(target.position.z));
             System.Diagnostics.Stopwatch w = new System.Diagnostics.Stopwatch();
             w.Start();
-            List<Tuple<int,int>> path = MapPathfinder.GetSlowFullPathFrom(null, origxz, targetxz, 512);
+            List<Tuple<int,int>> path = MapPathfinder.GetSlowFullPathFrom(map, origxz, targetxz, 512);
             w.Stop();
             if (path == null || path.Count == 0)
             {
