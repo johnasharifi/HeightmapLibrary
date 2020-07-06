@@ -28,14 +28,16 @@ public static class MapPathfinder
 
         // assume {fast && approximate} tolerates us returning literally any known path from orig -> intermediate, + intermediate -> target
 
-        // if distance longer than 2, split and recurse. 
-        // had to check distance > 2 instead of 1; with 1, encountered a stack overflow from cell i,j to cell (i+1),j
-        // cases: with dist > 2:
-        // i,j to (i+1),j is 1, which is not greater than 2
-        // i,j to (i+1),(j+1) is 1.41 which is not greater than 2
-        // i,j to (i+2),j is 2 which is not greater than 2
-        if (dist > 2)
+        if (dist <= 2)
         {
+            // cases:
+            // i,j to (i + 1),j: dist = 1
+            // i,j to (i + 1),(j + 1): dist = 2
+            return GetFastShortDistanceFrom(map, orig, target);
+        }
+        else
+        {
+            // if distance longer than 2, split and recurse. 
             Tuple<int, int> p_intermediate = new Tuple<int, int>((orig.Item1 + target.Item1) / 2, (orig.Item2 + target.Item2) / 2);
             List<Tuple<int, int>> p1 = GetFastApproximateFullPathFrom(map, orig, p_intermediate);
             List<Tuple<int, int>> p2 = GetFastApproximateFullPathFrom(map, p_intermediate, target);
@@ -43,17 +45,14 @@ public static class MapPathfinder
             // join two paths
             List<Tuple<int, int>> combined = new List<Tuple<int, int>>(p1);
             combined.AddRange(p2);
-            
+
             // store in cache so we don't lose work. we only have to store path from ij to nm.
             recPathCache[p4] = combined;
 
             return combined;
         }
 
-
-        // store in cache so we don't lose work
-        // implicit last case: adjacents, and no known path yet
-        return GetFastShortDistanceFrom(map, orig, target);
+        // later we could modify distance check and cases
     }
 
     /// <summary>
@@ -70,53 +69,6 @@ public static class MapPathfinder
 
         // this function will be extended later to support caching even when distances > 1, and better solutions even when i,j is
         // within distance 1 but not adjacent (due to cells being unpathable)
-    }
-
-
-    // TODO stub; implement faster more general function later
-    public static List<Tuple<int,int>> GetSlowFullPathFrom(Heightmap map, Tuple<int,int> orig, Tuple<int, int> target, int cellSearchLimit = 128)
-    {
-        // param from $map
-        int maxDim = map.getMaxDim();
-
-        // general objective:
-        // use cell grid search. BFS from $orig to $target.
-        // this pathfinding process will not work if we start from target and work backwards.
-
-        // a point can serve as both a lookup for whether a point has been visited, and a map to shortest known path
-        Dictionary<Tuple<int, int>, List<Tuple<int, int>>> shortestPath = new Dictionary<Tuple<int, int>, List<Tuple<int, int>>>();
-        // shortest path from $orig to $orig is empty list
-        shortestPath.Add(orig, new List<Tuple<int, int>>());
-        
-        Queue<Tuple<int, int>> pending = new Queue<Tuple<int, int>>();
-        pending.Enqueue(orig);
-        int iters = 0;
-        while (pending.Count > 0 && iters++ < cellSearchLimit)
-        {
-            Tuple<int,int> top = pending.Dequeue();
-            foreach (Tuple<int,int> adj in GetAdjacent(maxDim, top))
-            {
-                if (shortestPath.ContainsKey(adj)) continue; // -> we have already encountered this path. assume we already have the shortest path
-                if (!shortestPath.ContainsKey(top)) continue; // -> we do not actually know a path to this cell
-
-                // the path to $adj is <path from orig to top> + <top>
-                // presumably we need to copy the list's elements using GetRange
-                shortestPath[adj] = shortestPath[top].GetRange(0, shortestPath[top].Count);
-                shortestPath[adj].Add(top);
-
-                if (shortestPath.ContainsKey(target))
-                {
-                    // if adj == target, then we already built the path
-                    return shortestPath[target];
-                }
-
-                // else add it to the stack of things to investigate
-                pending.Enqueue(adj);
-            }
-        }
-
-        // either no path, or no path found within time available
-        return null;
     }
     
     // TODO cache adjacency data; currently we do n^2 iteration and new() each time, but could cache to avoid impact
