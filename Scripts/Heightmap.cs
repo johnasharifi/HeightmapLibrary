@@ -31,6 +31,8 @@ public class Heightmap
     {
         return Mathf.Max(dim1, dim2);
     }
+    
+    public HeightmapSpeedLookupTable speedTable { get; set; }
 
     private Dictionary<int, HashSet<Tuple<int, int>>> points = new Dictionary<int, HashSet<Tuple<int, int>>>();
 
