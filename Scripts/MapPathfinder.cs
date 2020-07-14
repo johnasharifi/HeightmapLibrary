@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Path = System.Collections.Generic.List<System.Tuple<int, int>>;
 
 // TODO alias tuple generics
 // using TupleInt2 = System.Tuple<int, int>;
@@ -12,6 +13,9 @@ public static class MapPathfinder
     // TODO compute distance per each segment, cache
     // TODO cache search results between segments
     // TODO A* pathing
+
+    // Contains info about map routes
+    private static Dictionary<Vector2, MapRouteMagnet> routerTable = new Dictionary<Vector2, MapRouteMagnet>();
 
     private const int maxSegmentSplitDistance = 2;
 

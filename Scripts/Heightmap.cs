@@ -162,7 +162,7 @@ public class Heightmap
         {
             foreach (Tuple<int,int> point in kvp.Value)
             {
-                colors[point.Item1 * dim1 + point.Item2] = mapping[kvp.Key];
+                colors[point.Item2 * dim1 + point.Item1] = mapping[kvp.Key];
             }
         }
 

@@ -13,14 +13,19 @@ public class PathfindingTotem : MonoBehaviour
 
     [Range(64, 512)]
     [SerializeField] private int dims;
-    
+
+    public Heightmap GetMap { get { return map; } }
+
+    HeightmapColorLookupTable lut;
+    public HeightmapColorLookupTable GetLut { get { return lut; } }
+
     // Start is called before the first frame update
     void Start()
     {
         map = new Heightmap(dims, dims);
         var filter_water = MapFilterFactory.GetPerlinBand(dims, dims, 1.0f, 0.4f, 0.43f);
         var filter_exterior = MapFilterFactory.GetBlendedExteriorWeight(dims, dims, 0.5f);
-        var filter_lattice = MapFilterFactory.GetPerlinBand(dims, dims, 10.0f, 0.3f, 0.4f);
+        var filter_lattice = MapFilterFactory.GetPerlinBand(dims, dims, 20.0f, 0.3f, 0.4f);
         var filter_mountains = MapFilterFactory.GetPerlinBand(dims, dims, 5.0f, 0.4f, 0.5f);
         var filter_forests = MapFilterFactory.GetPerlinBand(dims, dims, 10.0f, 0.4f, 0.5f);
         var filter_plains = MapFilterFactory.GetPerlinBand(dims, dims, 5.0f, 0.4f, 0.5f);
@@ -44,7 +49,7 @@ public class PathfindingTotem : MonoBehaviour
             { -1, Color.white },
             {1, Color.white }
         };
-        HeightmapColorLookupTable lut = new HeightmapColorLookupTable(mapping);
+        lut = new HeightmapColorLookupTable(mapping);
 
         HeightmapSpeedLookupTable speedTable = new HeightmapSpeedLookupTable
         {
