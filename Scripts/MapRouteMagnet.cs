@@ -27,44 +27,35 @@ public class MapRouteMagnet : MonoBehaviour
         return string.Format("{0} x {1} to \t {2} x {3}", origin.x, origin.y, origin.x + span.x, origin.y + span.y);
     }
 
-    /// <summary>
-    /// Occurs when object is visibe in scene view. Drawn lines remain on screen until a screen refresh is triggered
-    /// </summary>
-    private void OnDrawGizmos()
+    public Vector3 P1
     {
-        if (Application.isPlaying && UnityEditor.Selection.activeGameObject == gameObject)
+        get
         {
-            Tuple<int, int> bl = new Tuple<int, int>((int) origin.x, (int) origin.y);
-            Tuple<int, int> tr = new Tuple<int, int>((int)(origin.x + span.x - 1), (int)(origin.y + span.y - 1));
-
-            int tbl = totem.GetMap[bl.Item1, bl.Item2];
-            int ttr = totem.GetMap[tr.Item1, tr.Item2];
-
-            Color colorOrigin = totem.GetLut[tbl];
-            Color colorTerminus = totem.GetLut[ttr];
-
-            Debug.LogFormat("bottom left point {0}\tregion type {1}\tcolor{2}.\t=====\ttop right point {3}\tregion type {4}\tcolor {5}", bl, tbl, colorOrigin, tr, ttr, colorTerminus);
-
-            // bl must be (-1,-1)
-            // tr could be (-0,-0) or (0,-1)
+            return Origin + transform.forward * magnetScaleReduction;
         }
+    }
 
-        // reset position when user selects
-        SetPosition(transform.position);
-        if (UnityEditor.Selection.activeGameObject == gameObject) {
-            
-            foreach (MapRouteMagnet mag in adjacents)
-            {
-                Debug.DrawLine(transform.position, mag.transform.position);
-            }
+    public Vector3 P3
+    {
+        get
+        {
+            return Origin + transform.right * magnetScaleReduction;
+        }
+    }
 
-            // Debug.DrawLine(transform.position, transform.position + transform.forward * magnetScaleReduction);
+    public Vector3 Origin
+    {
+        get
+        {
+            return transform.position - new Vector3(0.5f, 0f, 0.5f);
+        }
+    }
 
-            Vector3 offset = new Vector3(-0.5f, 0f, -0.5f);
-            Debug.DrawLine(transform.position + offset, transform.position + offset + transform.forward * magnetScaleReduction);
-            Debug.DrawLine(transform.position + offset + transform.forward * magnetScaleReduction, transform.position + offset + transform.forward * magnetScaleReduction + transform.right * magnetScaleReduction);
-            Debug.DrawLine(transform.position + offset + transform.forward * magnetScaleReduction + transform.right * magnetScaleReduction, transform.position + offset + transform.right * magnetScaleReduction);
-            Debug.DrawLine(transform.position + offset + transform.right * magnetScaleReduction, transform.position + offset);
+    public Vector3 Terminus
+    {
+        get
+        {
+            return Origin + new Vector3(span.x, 0f, span.y);
         }
     }
 }
