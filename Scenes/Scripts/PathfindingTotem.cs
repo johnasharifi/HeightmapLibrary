@@ -25,7 +25,7 @@ public class PathfindingTotem : MonoBehaviour
         map = new Heightmap(dims, dims);
         var filter_water = MapFilterFactory.GetPerlinBand(dims, dims, 1.0f, 0.4f, 0.43f);
         var filter_exterior = MapFilterFactory.GetBlendedExteriorWeight(dims, dims, 0.5f);
-        var filter_lattice = MapFilterFactory.GetPerlinBand(dims, dims, 20.0f, 0.3f, 0.4f);
+        var filter_lattice = MapFilterFactory.GetPerlinBand(dims, dims, 15.0f, 0.3f, 0.4f);
         var filter_mountains = MapFilterFactory.GetPerlinBand(dims, dims, 5.0f, 0.4f, 0.5f);
         var filter_forests = MapFilterFactory.GetPerlinBand(dims, dims, 10.0f, 0.4f, 0.5f);
         var filter_plains = MapFilterFactory.GetPerlinBand(dims, dims, 5.0f, 0.4f, 0.5f);
