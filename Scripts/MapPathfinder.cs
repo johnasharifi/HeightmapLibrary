@@ -19,8 +19,12 @@ public static class MapPathfinder
 
     private const int maxSegmentSplitDistance = 2;
 
-    public static List<Tuple<int, int>> GetFastApproximateFullPathFrom(Heightmap map, Tuple<int,int> origxz, Tuple<int,int> targetxz)
+    public static List<Tuple<int, int>> GetFastApproximateFullPathFrom(Heightmap map, Tuple<int, int> origxz, Tuple<int, int> targetxz)
     {
+        // objective: split map into chunks, do fast checks with caching to determine path through chunks.
+        // then split chunk paths into smaller BFS searches
+        return BFS(map, origxz, targetxz);
+
         // case: distance > maxSegmentSearchDistance
         if (Mathf.Abs(origxz.Item1 - targetxz.Item1) + Mathf.Abs(origxz.Item2 - targetxz.Item2) > maxSegmentSplitDistance)
         {
@@ -32,8 +36,49 @@ public static class MapPathfinder
             pathP1.AddRange(pathP2);
             return (pathP1);
         }
-        
+
         return new List<Tuple<int, int>> { origxz };
+    }
+    
+    private static List<Tuple<int,int>> BFS(Heightmap map, Tuple<int,int> origxz, Tuple<int,int> targetxz)
+    {
+        int maxDim = map.getMaxDim();
+        
+        Path[,] paths = new Path[maxDim, maxDim];
+        paths[origxz.Item1, origxz.Item2] = new Path();
+
+        Queue<Tuple<int, int>> queue = new Queue<Tuple<int, int>>();
+        queue.Enqueue(origxz);
+
+        // origin point has a zero-len non-null path to itself
+        paths[origxz.Item1, origxz.Item2] = new Path();
+
+        int counter = 0;
+        while (queue.Count > 0 && counter++ < 4096)
+        {
+            Tuple<int, int> curr = queue.Dequeue();
+
+            foreach (Tuple<int,int> adj in GetAdjacent(maxDim, curr))
+            {
+                // if no path, we need to define a path
+                if (paths[adj.Item1, adj.Item2] == null)
+                {
+                    Path pathAdj = paths[curr.Item1, curr.Item2].GetRange(0, paths[curr.Item1, curr.Item2].Count);
+                    pathAdj.Add(adj);
+                    paths[adj.Item1, adj.Item2] = pathAdj;
+
+                    queue.Enqueue(adj);
+
+                    if (adj.Item1 == targetxz.Item1 && adj.Item2 == targetxz.Item2)
+                    {
+                        return paths[adj.Item1, adj.Item2];
+                    }
+                }
+            }
+
+        }
+        
+        return new Path();
     }
 
     // TODO cache adjacency data; currently we do n^2 iteration and new() each time, but could cache to avoid impact
@@ -43,7 +88,7 @@ public static class MapPathfinder
     /// <param name="maxDim">Cell grid size</param>
     /// <param name="p">A point i,j in grid</param>
     /// <returns>A collection of cells adjacent to cell i,j</returns>
-    static IEnumerable<Tuple<int, int>> GetAdjacent (int maxDim, Tuple<int, int> p)
+    static IEnumerable<Tuple<int, int>> GetAdjacent(int maxDim, Tuple<int, int> p)
     {
         HashSet<Tuple<int, int>> items = new HashSet<Tuple<int, int>>();
 
