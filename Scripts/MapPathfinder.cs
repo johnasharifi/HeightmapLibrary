@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Linq;
 using Path = System.Collections.Generic.List<System.Tuple<int, int>>;
 
 // TODO alias tuple generics
 // using TupleInt2 = System.Tuple<int, int>;
 // using TupleInt4 = System.Tuple<int,int,int,int>;
 
+// TODO make a non-static method of a Heightmap
+
 public static class MapPathfinder
 {
-    // TODO compute distance per each segment, cache
     // TODO cache search results between segments
-    // TODO A* pathing
-
+    
     // Contains info about map routes
     private static Dictionary<Vector2, MapRouteMagnet> routerTable = new Dictionary<Vector2, MapRouteMagnet>();
 
@@ -21,25 +22,55 @@ public static class MapPathfinder
 
     public static List<Tuple<int, int>> GetFastApproximateFullPathFrom(Heightmap map, Tuple<int, int> origxz, Tuple<int, int> targetxz)
     {
-        // objective: split map into chunks, do fast checks with caching to determine path through chunks.
-        // then split chunk paths into smaller BFS searches
-        return BFS(map, origxz, targetxz);
-
-        // case: distance > maxSegmentSearchDistance
-        if (Mathf.Abs(origxz.Item1 - targetxz.Item1) + Mathf.Abs(origxz.Item2 - targetxz.Item2) > maxSegmentSplitDistance)
-        {
-            Tuple<int, int> intermediate = new Tuple<int, int>((origxz.Item1 + targetxz.Item1) / 2, (origxz.Item2 + targetxz.Item2) / 2);
-
-            List<Tuple<int, int>> pathP1 = GetFastApproximateFullPathFrom(map, origxz, intermediate);
-            List<Tuple<int, int>> pathP2 = GetFastApproximateFullPathFrom(map, intermediate, targetxz);
-
-            pathP1.AddRange(pathP2);
-            return (pathP1);
-        }
-
-        return new List<Tuple<int, int>> { origxz };
+        return Astar(map, origxz, targetxz);
     }
     
+    private static List<Tuple<int,int>> Astar(Heightmap map, Tuple<int,int> origxz, Tuple<int,int> targetxz)
+    {
+        SortedDictionary<float, Path> paths = new SortedDictionary<float, Path>();
+        paths[0f] = new Path(new Tuple<int, int>[] { origxz });
+
+        int maxDim = map.getMaxDim();
+
+        // array of nulls
+        Path[,] added = new Path[maxDim, maxDim];
+
+        int counter = 0;
+        while (paths.Count > 0 && counter++ < 4096)
+        {
+            float priorityDistance = paths.Keys.First();
+            Path priorityPath = paths[priorityDistance];
+            Tuple<int, int> priorityTerminus = priorityPath[priorityPath.Count - 1];
+
+            foreach (Tuple<int, int> adj in GetAdjacent(maxDim, priorityTerminus))
+            {
+                if (added[adj.Item1, adj.Item2] == null)
+                {
+                    // add to array of paths so we know sequence of steps from origxz to adj
+                    Path pathAdj = priorityPath.GetRange(0, priorityPath.Count);
+                    pathAdj.Add(adj);
+                    added[adj.Item1, adj.Item2] = pathAdj;
+
+                    // inverse of speed = cost approximation. diagonal moves cost 1.4x 
+                    float traversalDistance = 1.0f / map.speedTable[map[adj.Item1, adj.Item2]] * Vector2.SqrMagnitude(new Vector2(origxz.Item1, origxz.Item2) - new Vector2(adj.Item1, adj.Item2));
+                    float distanceAdj = priorityDistance + traversalDistance;
+                    paths[distanceAdj] = pathAdj;
+
+                    // if we reached the target by any path, return that path
+                    if (adj.Item1 == targetxz.Item1 && adj.Item2 == targetxz.Item2)
+                    {
+                        return added[adj.Item1, adj.Item2];
+                    }
+                }
+            }
+            
+            // remove first element from sorted dictionary
+            paths.Remove(paths.Keys.First());
+        }
+        
+        return new Path();
+    }
+
     private static List<Tuple<int,int>> BFS(Heightmap map, Tuple<int,int> origxz, Tuple<int,int> targetxz)
     {
         int maxDim = map.getMaxDim();
