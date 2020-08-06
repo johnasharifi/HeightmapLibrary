@@ -7,6 +7,32 @@ public class Heightmap
 {
     private int dim1;
     private int dim2;
+    
+    /// <summary>
+    /// Gets dimension of the map.
+    /// </summary>
+    /// <param name="dimension"></param>
+    /// <returns></returns>
+    public int getDim(int dimension)
+    {
+        if (dimension == 0)
+        {
+            return dim1;
+        }
+        // easier to expand to n dimensions in future
+        return dim2;
+    }
+
+    /// <summary>
+    /// Gets max dimension of map.
+    /// </summary>
+    /// <returns>Max of dim1, dim2 args which are provided on construction.</returns>
+    public int getMaxDim()
+    {
+        return Mathf.Max(dim1, dim2);
+    }
+    
+    public HeightmapSpeedLookupTable speedTable { get; set; }
 
     private Dictionary<int, HashSet<Tuple<int, int>>> points = new Dictionary<int, HashSet<Tuple<int, int>>>();
 
@@ -136,7 +162,7 @@ public class Heightmap
         {
             foreach (Tuple<int,int> point in kvp.Value)
             {
-                colors[point.Item1 * dim1 + point.Item2] = mapping[kvp.Key];
+                colors[point.Item2 * dim1 + point.Item1] = mapping[kvp.Key];
             }
         }
 
