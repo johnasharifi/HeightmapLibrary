@@ -111,28 +111,39 @@ public static class MapPathfinder
         
         return new Path();
     }
-
-    // TODO cache adjacency data; currently we do n^2 iteration and new() each time, but could cache to avoid impact
+    
     /// <summary>
     /// Defines adjacency for a cell i,j in a grid of integer-discretized cells
     /// </summary>
     /// <param name="maxDim">Cell grid size</param>
     /// <param name="p">A point i,j in grid</param>
     /// <returns>A collection of cells adjacent to cell i,j</returns>
+    private static IEnumerable<Tuple<int, int>>[,] adjCache;
     static IEnumerable<Tuple<int, int>> GetAdjacent(int maxDim, Tuple<int, int> p)
     {
-        HashSet<Tuple<int, int>> items = new HashSet<Tuple<int, int>>();
-
-        HashSet<Tuple<int, int>> collection = new HashSet<Tuple<int, int>>();
-        for (int i = p.Item1 - 1; i >= 0 && i < maxDim && i < p.Item1 + 2; i++)
+        if (adjCache == null)
         {
-            for (int j = p.Item2 - 1; j >= 0 && j < maxDim && j < p.Item2 + 2; j++)
-            {
-                // skip original point
-                if (i == p.Item1 && j == p.Item2) { continue; };
-                items.Add(new Tuple<int, int>(i, j));
-            }
+            adjCache = new IEnumerable<Tuple<int, int>>[maxDim, maxDim];
         }
-        return items;
+
+        if (adjCache[p.Item1, p.Item2] == null)
+        {
+            HashSet<Tuple<int, int>> items = new HashSet<Tuple<int, int>>();
+
+            HashSet<Tuple<int, int>> collection = new HashSet<Tuple<int, int>>();
+            for (int i = p.Item1 - 1; i >= 0 && i < maxDim && i < p.Item1 + 2; i++)
+            {
+                for (int j = p.Item2 - 1; j >= 0 && j < maxDim && j < p.Item2 + 2; j++)
+                {
+                    // skip original point
+                    if (i == p.Item1 && j == p.Item2) { continue; };
+                    items.Add(new Tuple<int, int>(i, j));
+                }
+            }
+
+            adjCache[p.Item1, p.Item2] = items;
+        }
+
+        return adjCache[p.Item1, p.Item2];
     }
 }
