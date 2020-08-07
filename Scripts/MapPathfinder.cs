@@ -24,9 +24,22 @@ public static class MapPathfinder
     {
         return Astar(map, origxz, targetxz);
     }
-    
+
+    private static Tuple<Tuple<int, int>, Tuple<int, int>, Path> lastKnownPath = null;
+
     private static List<Tuple<int,int>> Astar(Heightmap map, Tuple<int,int> origxz, Tuple<int,int> targetxz)
     {
+        if (lastKnownPath != null)
+        {
+            bool sameOrigin = lastKnownPath.Item1.Item1 == origxz.Item1 && lastKnownPath.Item1.Item2 == origxz.Item2;
+            bool sameTarget = lastKnownPath.Item2.Item1 == targetxz.Item1 && lastKnownPath.Item2.Item2 == targetxz.Item2;
+
+            if (sameOrigin && sameTarget)
+            {
+                return lastKnownPath.Item3;
+            }
+        }
+
         SortedDictionary<float, Path> paths = new SortedDictionary<float, Path>();
         paths[0f] = new Path(new Tuple<int, int>[] { origxz });
 
@@ -59,6 +72,8 @@ public static class MapPathfinder
                     // if we reached the target by any path, return that path
                     if (adj.Item1 == targetxz.Item1 && adj.Item2 == targetxz.Item2)
                     {
+                        // cache known best path so we can spare FPS once we find ideal path once
+                        lastKnownPath = new Tuple<Tuple<int, int>, Tuple<int, int>, Path>(origxz, targetxz, added[adj.Item1, adj.Item2]);
                         return added[adj.Item1, adj.Item2];
                     }
                 }
