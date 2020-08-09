@@ -13,6 +13,7 @@ using Path = System.Collections.Generic.List<System.Tuple<int, int>>;
 
 public static class MapPathfinder
 {
+    private static bool featurePathfindingDebugDraw = true;
     // TODO cache search results between segments
     
     // Contains info about map routes
@@ -29,7 +30,7 @@ public static class MapPathfinder
 
     private static List<Tuple<int,int>> Astar(Heightmap map, Tuple<int,int> origxz, Tuple<int,int> targetxz)
     {
-        if (lastKnownPath != null)
+        if (false && lastKnownPath != null)
         {
             bool sameOrigin = lastKnownPath.Item1.Item1 == origxz.Item1 && lastKnownPath.Item1.Item2 == origxz.Item2;
             bool sameTarget = lastKnownPath.Item2.Item1 == targetxz.Item1 && lastKnownPath.Item2.Item2 == targetxz.Item2;
@@ -42,14 +43,15 @@ public static class MapPathfinder
 
         SortedDictionary<float, Path> paths = new SortedDictionary<float, Path>();
         paths[0f] = new Path(new Tuple<int, int>[] { origxz });
+        
 
         int maxDim = map.getMaxDim();
 
         // array of nulls
         Path[,] added = new Path[maxDim, maxDim];
-
+        
         int counter = 0;
-        while (paths.Count > 0 && counter++ < 4096)
+        while (paths.Count > 0 && counter < 4096)
         {
             float priorityDistance = paths.Keys.First();
             Path priorityPath = paths[priorityDistance];
@@ -64,9 +66,12 @@ public static class MapPathfinder
                     pathAdj.Add(adj);
                     added[adj.Item1, adj.Item2] = pathAdj;
 
-                    // inverse of speed = cost approximation. diagonal moves cost 1.4x 
-                    float traversalDistance = 1.0f / map.speedTable[map[adj.Item1, adj.Item2]] * Vector2.SqrMagnitude(new Vector2(origxz.Item1, origxz.Item2) - new Vector2(adj.Item1, adj.Item2));
-                    float distanceAdj = priorityDistance + traversalDistance;
+                    Vector2 stepVector = new Vector2(targetxz.Item1 - adj.Item1, targetxz.Item2 - adj.Item2);
+                    Vector2 approachVector = new Vector2(targetxz.Item1 - origxz.Item1, targetxz.Item2 - origxz.Item2);
+                    float traversalCost = stepVector.sqrMagnitude / map.speedTable[map[adj.Item1, adj.Item2]];
+                    float approachBonus = stepVector.sqrMagnitude / approachVector.SqrMagnitude();
+
+                    float distanceAdj = priorityDistance + approachBonus + traversalCost;
                     paths[distanceAdj] = pathAdj;
 
                     // if we reached the target by any path, return that path
@@ -74,16 +79,44 @@ public static class MapPathfinder
                     {
                         // cache known best path so we can spare FPS once we find ideal path once
                         lastKnownPath = new Tuple<Tuple<int, int>, Tuple<int, int>, Path>(origxz, targetxz, added[adj.Item1, adj.Item2]);
+
+                        if(featurePathfindingDebugDraw)
+                        {
+                            DrawDebugPath(added, paths[distanceAdj].Count);
+                        }
+                        
                         return added[adj.Item1, adj.Item2];
                     }
+                    
+                    counter++;
                 }
             }
-            
+
             // remove first element from sorted dictionary
             paths.Remove(paths.Keys.First());
         }
         
         return new Path();
+    }
+
+    private static void DrawDebugPath(Path[,] pathRecords, int longestPath)
+    {
+        GameObject go = GameObject.Find("PathfindingDebugQuad");
+        if (go == null) return;
+        int maxDim = pathRecords.GetLength(0);
+
+        Texture2D pathLogger = new Texture2D(maxDim, maxDim);
+        for (int i = 0; i < maxDim; i++)
+        {
+            for (int j = 0; j < maxDim; j++)
+            {
+                if (pathRecords[i,j] != null)
+                    pathLogger.SetPixel(i, j, Color.Lerp(Color.white, Color.blue, pathRecords[i,j].Count * 1.0f / longestPath));
+            }
+        }
+        pathLogger.Apply();
+
+        go.GetComponent<Renderer>().material.mainTexture = pathLogger;
     }
 
     private static List<Tuple<int,int>> BFS(Heightmap map, Tuple<int,int> origxz, Tuple<int,int> targetxz)
