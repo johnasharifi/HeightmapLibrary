@@ -9,6 +9,8 @@ using Path = System.Collections.Generic.List<System.Tuple<int, int>>;
 // using TupleInt2 = System.Tuple<int, int>;
 // using TupleInt4 = System.Tuple<int,int,int,int>;
 
+// TODO ensure tuples cannot trigger index-out-of-bounds errors when looking up vectorRecommendedPaths
+
 // TODO make a non-static method of a Heightmap
 
 public static class MapPathfinder
@@ -25,25 +27,18 @@ public static class MapPathfinder
     {
         return Astar(map, origxz, targetxz);
     }
-
-    private static Tuple<Tuple<int, int>, Tuple<int, int>, Path> lastKnownPath = null;
-
+    
     private static List<Tuple<int,int>> Astar(Heightmap map, Tuple<int,int> origxz, Tuple<int,int> targetxz)
     {
-        if (false && lastKnownPath != null)
+        Path p = GetVectorPathRecommendation(map, origxz, targetxz);
+        if (p != null)
         {
-            bool sameOrigin = lastKnownPath.Item1.Item1 == origxz.Item1 && lastKnownPath.Item1.Item2 == origxz.Item2;
-            bool sameTarget = lastKnownPath.Item2.Item1 == targetxz.Item1 && lastKnownPath.Item2.Item2 == targetxz.Item2;
-
-            if (sameOrigin && sameTarget)
-            {
-                return lastKnownPath.Item3;
-            }
+            // cached path from origin to target
+            return p;
         }
-
+        
         SortedDictionary<float, Path> paths = new SortedDictionary<float, Path>();
         paths[0f] = new Path(new Tuple<int, int>[] { origxz });
-        
 
         int maxDim = map.getMaxDim();
 
@@ -51,7 +46,7 @@ public static class MapPathfinder
         Path[,] added = new Path[maxDim, maxDim];
         
         int counter = 0;
-        while (paths.Count > 0 && counter < 4096)
+        while (paths.Count > 0 && counter++ < 4096)
         {
             float priorityDistance = paths.Keys.First();
             Path priorityPath = paths[priorityDistance];
@@ -77,18 +72,17 @@ public static class MapPathfinder
                     // if we reached the target by any path, return that path
                     if (adj.Item1 == targetxz.Item1 && adj.Item2 == targetxz.Item2)
                     {
-                        // cache known best path so we can spare FPS once we find ideal path once
-                        lastKnownPath = new Tuple<Tuple<int, int>, Tuple<int, int>, Path>(origxz, targetxz, added[adj.Item1, adj.Item2]);
-
                         if(featurePathfindingDebugDraw)
                         {
+                            // assume first key -> path to target
                             DrawDebugPath(added, paths[distanceAdj].Count);
                         }
-                        
+
+                        AddPathRecommendation(map, added[adj.Item1, adj.Item2]);
+
                         return added[adj.Item1, adj.Item2];
                     }
                     
-                    counter++;
                 }
             }
 
@@ -193,5 +187,51 @@ public static class MapPathfinder
         }
 
         return adjCache[p.Item1, p.Item2];
+    }
+    
+    private static Dictionary<Tuple<int, int, int, int>, Path> pathCache = new Dictionary<Tuple<int, int, int, int>, Path>();
+    private static void AddPathRecommendation(Heightmap map, Path path)
+    {
+        // most important - path from origin to end
+        pathCache[new Tuple<int,int,int,int>(path[0].Item1, path[0].Item2, path[path.Count - 1].Item1, path[path.Count - 1].Item2)] = path;
+
+        // also cache sub-steps
+        const int stepSize = 8;
+        for (int i = 0; i < path.Count - stepSize; i = i + stepSize / 2)
+        {
+            int ind0 = path[i].Item1;
+            int ind1 = path[i].Item2;
+            int ind2 = path[i + stepSize].Item1;
+            int ind3 = path[i + stepSize].Item2;
+            
+            pathCache[new Tuple<int,int,int,int>(ind0, ind1, ind2, ind3)] = path.GetRange(i, stepSize);
+        }
+    }
+    
+    /// <summary>
+    /// Gets a short Path that user can follow from original position to target position.
+    /// </summary>
+    /// <param name="map"></param>
+    /// <param name="orig"></param>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    private static Path GetVectorPathRecommendation(Heightmap map, Tuple<int,int> orig, Tuple<int,int> target)
+    {
+        int ind0 = orig.Item1;
+        int ind1 = orig.Item2;
+        int ind2 = target.Item1;
+        int ind3 = target.Item2;
+
+        Tuple<int, int, int, int> t = new Tuple<int, int, int, int>(orig.Item1, orig.Item2, target.Item1, target.Item2);
+        if (pathCache.ContainsKey(t))
+        {
+            Debug.LogFormat("GetPath. searching index {1} x {2} to {3} x{4}. got {5} elements", 0, ind0, ind1, ind2, ind3, pathCache[t].Count);
+            return pathCache[t];
+        }
+        else {
+            Debug.LogFormat("GetPath. searching index {1} x {2} to {3} x {4}. no known path", 0, ind0, ind1, ind2, ind3);
+        }
+
+        return null;
     }
 }
