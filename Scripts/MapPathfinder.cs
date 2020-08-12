@@ -20,9 +20,7 @@ public static class MapPathfinder
     
     // Contains info about map routes
     private static Dictionary<Vector2, MapRouteMagnet> routerTable = new Dictionary<Vector2, MapRouteMagnet>();
-
-    private const int maxSegmentSplitDistance = 2;
-
+    
     public static List<Tuple<int, int>> GetFastApproximateFullPathFrom(Heightmap map, Tuple<int, int> origxz, Tuple<int, int> targetxz)
     {
         return Astar(map, origxz, targetxz);
@@ -30,13 +28,6 @@ public static class MapPathfinder
     
     private static List<Tuple<int,int>> Astar(Heightmap map, Tuple<int,int> origxz, Tuple<int,int> targetxz)
     {
-        Path p = GetVectorPathRecommendation(map, origxz, targetxz);
-        if (p != null)
-        {
-            // cached path from origin to target
-            return p;
-        }
-        
         SortedDictionary<float, Path> paths = new SortedDictionary<float, Path>();
         paths[0f] = new Path(new Tuple<int, int>[] { origxz });
 
@@ -51,6 +42,16 @@ public static class MapPathfinder
             float priorityDistance = paths.Keys.First();
             Path priorityPath = paths[priorityDistance];
             Tuple<int, int> priorityTerminus = priorityPath[priorityPath.Count - 1];
+
+            Path pShorter = GetVectorPathRecommendation(map, priorityTerminus, targetxz);
+            if (pShorter != null)
+            {
+                // accelerate search by looking up path from current to target
+                Path pShortInstance = priorityPath.GetRange(0, priorityPath.Count);
+                pShortInstance.AddRange(pShorter);
+                // use heuristic to compute dist estimate
+                paths[priorityDistance + 10f] = pShortInstance;
+            }
 
             foreach (Tuple<int, int> adj in GetAdjacent(maxDim, priorityTerminus))
             {
@@ -192,10 +193,10 @@ public static class MapPathfinder
     private static Dictionary<Tuple<int, int, int, int>, Path> pathCache = new Dictionary<Tuple<int, int, int, int>, Path>();
     private static void AddPathRecommendation(Heightmap map, Path path)
     {
-        // most important - path from origin to end
-        pathCache[new Tuple<int,int,int,int>(path[0].Item1, path[0].Item2, path[path.Count - 1].Item1, path[path.Count - 1].Item2)] = path;
+        // most important - cache full length path
+        pathCache[new Tuple<int, int, int, int>(path[0].Item1, path[0].Item2, path[path.Count - 1].Item1, path[path.Count - 1].Item2)] = path;
 
-        // also cache sub-steps
+        // cache sub-steps
         const int stepSize = 8;
         for (int i = 0; i < path.Count - stepSize; i = i + stepSize / 2)
         {
@@ -225,11 +226,7 @@ public static class MapPathfinder
         Tuple<int, int, int, int> t = new Tuple<int, int, int, int>(orig.Item1, orig.Item2, target.Item1, target.Item2);
         if (pathCache.ContainsKey(t))
         {
-            Debug.LogFormat("GetPath. searching index {1} x {2} to {3} x{4}. got {5} elements", 0, ind0, ind1, ind2, ind3, pathCache[t].Count);
             return pathCache[t];
-        }
-        else {
-            Debug.LogFormat("GetPath. searching index {1} x {2} to {3} x {4}. no known path", 0, ind0, ind1, ind2, ind3);
         }
 
         return null;
