@@ -30,6 +30,12 @@ public static class MapPathfinder
     {
         SortedDictionary<float, Path> paths = new SortedDictionary<float, Path>();
         paths[0f] = new Path(new Tuple<int, int>[] { origxz });
+        
+        Path pShort = GetPathRecommendation(map, origxz, targetxz);
+        if (pShort != null)
+        {
+            return pShort;
+        }
 
         int maxDim = map.getMaxDim();
 
@@ -43,16 +49,6 @@ public static class MapPathfinder
             Path priorityPath = paths[priorityDistance];
             Tuple<int, int> priorityTerminus = priorityPath[priorityPath.Count - 1];
 
-            Path pShorter = GetVectorPathRecommendation(map, priorityTerminus, targetxz);
-            if (pShorter != null)
-            {
-                // accelerate search by looking up path from current to target
-                Path pShortInstance = priorityPath.GetRange(0, priorityPath.Count);
-                pShortInstance.AddRange(pShorter);
-                // use heuristic to compute dist estimate
-                paths[priorityDistance + 10f] = pShortInstance;
-            }
-
             foreach (Tuple<int, int> adj in GetAdjacent(maxDim, priorityTerminus))
             {
                 if (added[adj.Item1, adj.Item2] == null)
@@ -61,13 +57,14 @@ public static class MapPathfinder
                     Path pathAdj = priorityPath.GetRange(0, priorityPath.Count);
                     pathAdj.Add(adj);
                     added[adj.Item1, adj.Item2] = pathAdj;
+                    
+                    float traversalCost = (Mathf.Abs(adj.Item1 - priorityTerminus.Item1) + Mathf.Abs(adj.Item2 - priorityTerminus.Item2)) / map.speedTable[map[adj.Item1, adj.Item2]];
 
-                    Vector2 stepVector = new Vector2(targetxz.Item1 - adj.Item1, targetxz.Item2 - adj.Item2);
-                    Vector2 approachVector = new Vector2(targetxz.Item1 - origxz.Item1, targetxz.Item2 - origxz.Item2);
-                    float traversalCost = stepVector.sqrMagnitude / map.speedTable[map[adj.Item1, adj.Item2]];
-                    float approachBonus = stepVector.sqrMagnitude / approachVector.SqrMagnitude();
+                    float approachBonus = Vector2.Distance(new Vector2(targetxz.Item1, targetxz.Item2), new Vector2(adj.Item1, adj.Item2));
+                    float fleeBonus = Vector2.Distance(new Vector2(origxz.Item1, origxz.Item2), new Vector2(adj.Item1, adj.Item2));
 
-                    float distanceAdj = priorityDistance + approachBonus + traversalCost;
+                    // float distanceAdj = priorityDistance + approachBonus + traversalCost;
+                    float distanceAdj = approachBonus + 0.1f * fleeBonus + 0.1f * traversalCost + 0.1f * priorityDistance;
                     paths[distanceAdj] = pathAdj;
 
                     // if we reached the target by any path, return that path
@@ -169,14 +166,15 @@ public static class MapPathfinder
             adjCache = new IEnumerable<Tuple<int, int>>[maxDim, maxDim];
         }
 
+        const int span = 2;
         if (adjCache[p.Item1, p.Item2] == null)
         {
             HashSet<Tuple<int, int>> items = new HashSet<Tuple<int, int>>();
 
             HashSet<Tuple<int, int>> collection = new HashSet<Tuple<int, int>>();
-            for (int i = p.Item1 - 1; i >= 0 && i < maxDim && i < p.Item1 + 2; i++)
+            for (int i = p.Item1 - span; i >= 0 && i < maxDim && i < p.Item1 + span + 1; i++)
             {
-                for (int j = p.Item2 - 1; j >= 0 && j < maxDim && j < p.Item2 + 2; j++)
+                for (int j = p.Item2 - span; j >= 0 && j < maxDim && j < p.Item2 + span + 1; j++)
                 {
                     // skip original point
                     if (i == p.Item1 && j == p.Item2) { continue; };
@@ -193,36 +191,12 @@ public static class MapPathfinder
     private static Dictionary<Tuple<int, int, int, int>, Path> pathCache = new Dictionary<Tuple<int, int, int, int>, Path>();
     private static void AddPathRecommendation(Heightmap map, Path path)
     {
-        // most important - cache full length path
+        //cache only full length path
         pathCache[new Tuple<int, int, int, int>(path[0].Item1, path[0].Item2, path[path.Count - 1].Item1, path[path.Count - 1].Item2)] = path;
-
-        // cache sub-steps
-        const int stepSize = 8;
-        for (int i = 0; i < path.Count - stepSize; i = i + stepSize / 2)
-        {
-            int ind0 = path[i].Item1;
-            int ind1 = path[i].Item2;
-            int ind2 = path[i + stepSize].Item1;
-            int ind3 = path[i + stepSize].Item2;
-            
-            pathCache[new Tuple<int,int,int,int>(ind0, ind1, ind2, ind3)] = path.GetRange(i, stepSize);
-        }
     }
     
-    /// <summary>
-    /// Gets a short Path that user can follow from original position to target position.
-    /// </summary>
-    /// <param name="map"></param>
-    /// <param name="orig"></param>
-    /// <param name="target"></param>
-    /// <returns></returns>
-    private static Path GetVectorPathRecommendation(Heightmap map, Tuple<int,int> orig, Tuple<int,int> target)
+    private static Path GetPathRecommendation(Heightmap map, Tuple<int,int> orig, Tuple<int,int> target)
     {
-        int ind0 = orig.Item1;
-        int ind1 = orig.Item2;
-        int ind2 = target.Item1;
-        int ind3 = target.Item2;
-
         Tuple<int, int, int, int> t = new Tuple<int, int, int, int>(orig.Item1, orig.Item2, target.Item1, target.Item2);
         if (pathCache.ContainsKey(t))
         {
