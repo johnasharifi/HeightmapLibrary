@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Linq;
+using Point = System.Tuple<int, int>;
 using Path = System.Collections.Generic.List<System.Tuple<int, int>>;
 
 // TODO alias tuple generics
@@ -20,18 +21,28 @@ public static class MapPathfinder
     
     // Contains info about map routes
     private static Dictionary<Vector2, MapRouteMagnet> routerTable = new Dictionary<Vector2, MapRouteMagnet>();
-    
+
+    const float maxPointToPointMag = 2500f;
+    private static float Magnitude(Point p1, Point p2)
+    {
+        return Vector2.SqrMagnitude(new Vector2(p1.Item1, p1.Item2) - new Vector2(p2.Item1, p2.Item2));
+    }
     public static List<Tuple<int, int>> GetFastApproximateFullPathFrom(Heightmap map, Tuple<int, int> origxz, Tuple<int, int> targetxz)
     {
-        return Astar(map, origxz, targetxz);
+        if (Magnitude(origxz, targetxz) < maxPointToPointMag)
+        {
+            return Astar(map, origxz, targetxz, searchSpan: 1);
+        }
+        return Astar(map, origxz, targetxz, searchSpan: 2);
     }
     
-    private static List<Tuple<int,int>> Astar(Heightmap map, Tuple<int,int> origxz, Tuple<int,int> targetxz)
+    private static List<Tuple<int,int>> Astar(Heightmap map, Tuple<int,int> origxz, Tuple<int,int> targetxz, int searchSpan)
     {
         SortedDictionary<float, Path> paths = new SortedDictionary<float, Path>();
         paths[0f] = new Path(new Tuple<int, int>[] { origxz });
         
         Path pShort = GetPathRecommendation(map, origxz, targetxz);
+        pShort = null;
         if (pShort != null)
         {
             return pShort;
@@ -49,7 +60,7 @@ public static class MapPathfinder
             Path priorityPath = paths[priorityDistance];
             Tuple<int, int> priorityTerminus = priorityPath[priorityPath.Count - 1];
 
-            foreach (Tuple<int, int> adj in GetAdjacent(maxDim, priorityTerminus))
+            foreach (Tuple<int, int> adj in GetAdjacent(maxDim, priorityTerminus, searchSpan))
             {
                 if (added[adj.Item1, adj.Item2] == null)
                 {
@@ -64,7 +75,7 @@ public static class MapPathfinder
                     float fleeBonus = Vector2.Distance(new Vector2(origxz.Item1, origxz.Item2), new Vector2(adj.Item1, adj.Item2));
 
                     // float distanceAdj = priorityDistance + approachBonus + traversalCost;
-                    float distanceAdj = approachBonus + 0.1f * fleeBonus + 0.1f * traversalCost + 0.1f * priorityDistance;
+                    float distanceAdj = 0.2f * approachBonus + 0.1f * fleeBonus + 0.2f * traversalCost + 0.5f * priorityDistance;
                     paths[distanceAdj] = pathAdj;
 
                     // if we reached the target by any path, return that path
@@ -158,34 +169,24 @@ public static class MapPathfinder
     /// <param name="maxDim">Cell grid size</param>
     /// <param name="p">A point i,j in grid</param>
     /// <returns>A collection of cells adjacent to cell i,j</returns>
-    private static IEnumerable<Tuple<int, int>>[,] adjCache;
-    static IEnumerable<Tuple<int, int>> GetAdjacent(int maxDim, Tuple<int, int> p)
+    private static Dictionary<Tuple<int,int,int>, HashSet<Point>> adjCache = new Dictionary<Tuple<int, int, int>, HashSet<Point>>();
+    static IEnumerable<Tuple<int, int>> GetAdjacent(int maxDim, Tuple<int, int> p, int searchSpan = 1)
     {
-        if (adjCache == null)
+        if (!adjCache.ContainsKey(new Tuple<int,int,int>(p.Item1, p.Item2, searchSpan)))
         {
-            adjCache = new IEnumerable<Tuple<int, int>>[maxDim, maxDim];
-        }
+            adjCache[new Tuple<int, int, int>(p.Item1, p.Item2, searchSpan)] = new HashSet<Point>();
 
-        const int span = 2;
-        if (adjCache[p.Item1, p.Item2] == null)
-        {
-            HashSet<Tuple<int, int>> items = new HashSet<Tuple<int, int>>();
-
-            HashSet<Tuple<int, int>> collection = new HashSet<Tuple<int, int>>();
-            for (int i = p.Item1 - span; i >= 0 && i < maxDim && i < p.Item1 + span + 1; i++)
+            for (int i = Mathf.Max(0, p.Item1 - searchSpan); i < Mathf.Min(maxDim, p.Item1 + searchSpan + 1); i++)
             {
-                for (int j = p.Item2 - span; j >= 0 && j < maxDim && j < p.Item2 + span + 1; j++)
+                for (int j = Mathf.Max(0, p.Item2 - searchSpan); j < Mathf.Min(maxDim, p.Item2 + searchSpan + 1); j++)
                 {
-                    // skip original point
-                    if (i == p.Item1 && j == p.Item2) { continue; };
-                    items.Add(new Tuple<int, int>(i, j));
+                    if (i == j && j == p.Item2) continue; // ij is not adjacent to itself
+                    adjCache[new Tuple<int,int,int>(p.Item1, p.Item2, searchSpan)].Add(new Point(i,j));
                 }
             }
-
-            adjCache[p.Item1, p.Item2] = items;
         }
-
-        return adjCache[p.Item1, p.Item2];
+        
+        return adjCache[new Tuple<int,int,int>(p.Item1, p.Item2, searchSpan)];
     }
     
     private static Dictionary<Tuple<int, int, int, int>, Path> pathCache = new Dictionary<Tuple<int, int, int, int>, Path>();
