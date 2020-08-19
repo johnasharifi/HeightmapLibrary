@@ -4,13 +4,8 @@ using UnityEngine;
 using System;
 using System.Linq;
 using Point = System.Tuple<int, int>;
+using PointPair = System.Tuple<int, int, int, int>;
 using Path = System.Collections.Generic.List<System.Tuple<int, int>>;
-
-// TODO alias tuple generics
-// using TupleInt2 = System.Tuple<int, int>;
-// using TupleInt4 = System.Tuple<int,int,int,int>;
-
-// TODO ensure tuples cannot trigger index-out-of-bounds errors when looking up vectorRecommendedPaths
 
 // TODO make a non-static method of a Heightmap
 
@@ -73,8 +68,7 @@ public static class MapPathfinder
 
                     float approachBonus = Vector2.Distance(new Vector2(targetxz.Item1, targetxz.Item2), new Vector2(adj.Item1, adj.Item2));
                     float fleeBonus = Vector2.Distance(new Vector2(origxz.Item1, origxz.Item2), new Vector2(adj.Item1, adj.Item2));
-
-                    // float distanceAdj = priorityDistance + approachBonus + traversalCost;
+                    
                     float distanceAdj = 0.2f * approachBonus + 0.1f * fleeBonus + 0.2f * traversalCost + 0.5f * priorityDistance;
                     paths[distanceAdj] = pathAdj;
 
@@ -189,7 +183,7 @@ public static class MapPathfinder
         return adjCache[new Tuple<int,int,int>(p.Item1, p.Item2, searchSpan)];
     }
     
-    private static Dictionary<Tuple<int, int, int, int>, Path> pathCache = new Dictionary<Tuple<int, int, int, int>, Path>();
+    private static Dictionary<PointPair, Path> pathCache = new Dictionary<PointPair, Path>();
     private static void AddPathRecommendation(Heightmap map, Path path)
     {
         //cache only full length path
@@ -198,7 +192,7 @@ public static class MapPathfinder
     
     private static Path GetPathRecommendation(Heightmap map, Tuple<int,int> orig, Tuple<int,int> target)
     {
-        Tuple<int, int, int, int> t = new Tuple<int, int, int, int>(orig.Item1, orig.Item2, target.Item1, target.Item2);
+        Tuple<int, int, int, int> t = new PointPair(orig.Item1, orig.Item2, target.Item1, target.Item2);
         if (pathCache.ContainsKey(t))
         {
             return pathCache[t];
