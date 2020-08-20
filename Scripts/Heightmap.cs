@@ -60,6 +60,17 @@ public class Heightmap
         }
     }
 
+    private MapPathfinder pathfinder;
+    public List<Tuple<int,int>> PathFromTo(Tuple<int,int> origin, Tuple<int,int> target)
+    {
+        if (pathfinder == null)
+        {
+            pathfinder = new MapPathfinder(this);
+        }
+
+        return pathfinder.GetFastApproximateFullPathFrom(origin, target);
+    }
+
     public void MapFromTo(int originClass, int targetClass, Func<int, int, bool> predicate)
     {
         MapFromTo(originClass, targetClass, originClass, predicate);

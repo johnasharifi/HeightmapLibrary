@@ -80,10 +80,9 @@ public class PathfindingTotem : MonoBehaviour
         {
             Point origxz = new Point(Mathf.FloorToInt(transform.position.x), Mathf.FloorToInt(transform.position.z));
             Point targetxz = new Point(Mathf.FloorToInt(target.position.x), Mathf.FloorToInt(target.position.z));
-            System.Diagnostics.Stopwatch w = new System.Diagnostics.Stopwatch();
-            w.Start();
-            List<Point> path = MapPathfinder.GetFastApproximateFullPathFrom(map, origxz, targetxz);
-            w.Stop();
+
+            List<Point> path = map.PathFromTo(origxz, targetxz);
+
             if (path == null || path.Count == 0)
             {
                 lrend.enabled = false;
