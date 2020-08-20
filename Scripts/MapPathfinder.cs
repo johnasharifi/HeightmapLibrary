@@ -7,16 +7,10 @@ using Point = System.Tuple<int, int>;
 using PointPair = System.Tuple<int, int, int, int>;
 using Path = System.Collections.Generic.List<System.Tuple<int,int>>;
 
-// TODO make a non-static method of a Heightmap
-
 public static class MapPathfinder
 {
     private static bool featurePathfindingDebugDraw = true;
-    // TODO cache search results between segments
     
-    // Contains info about map routes
-    private static Dictionary<Vector2, MapRouteMagnet> routerTable = new Dictionary<Vector2, MapRouteMagnet>();
-
     const float maxPointToPointMag = 2500f;
     private static float Magnitude(Point p1, Point p2)
     {
@@ -114,47 +108,6 @@ public static class MapPathfinder
         pathLogger.Apply();
 
         go.GetComponent<Renderer>().material.mainTexture = pathLogger;
-    }
-
-    private static List<Point> BFS(Heightmap map, Point origxz, Point targetxz)
-    {
-        int maxDim = map.getMaxDim();
-        
-        Path[,] paths = new Path[maxDim, maxDim];
-        paths[origxz.Item1, origxz.Item2] = new Path();
-
-        Queue<Point> queue = new Queue<Point>();
-        queue.Enqueue(origxz);
-
-        // origin point has a zero-len non-null path to itself
-        paths[origxz.Item1, origxz.Item2] = new Path();
-
-        int counter = 0;
-        while (queue.Count > 0 && counter++ < 4096)
-        {
-            Point curr = queue.Dequeue();
-
-            foreach (Point adj in GetAdjacent(maxDim, curr))
-            {
-                // if no path, we need to define a path
-                if (paths[adj.Item1, adj.Item2] == null)
-                {
-                    Path pathAdj = paths[curr.Item1, curr.Item2].GetRange(0, paths[curr.Item1, curr.Item2].Count);
-                    pathAdj.Add(adj);
-                    paths[adj.Item1, adj.Item2] = pathAdj;
-
-                    queue.Enqueue(adj);
-
-                    if (adj.Item1 == targetxz.Item1 && adj.Item2 == targetxz.Item2)
-                    {
-                        return paths[adj.Item1, adj.Item2];
-                    }
-                }
-            }
-
-        }
-        
-        return new Path();
     }
     
     /// <summary>
