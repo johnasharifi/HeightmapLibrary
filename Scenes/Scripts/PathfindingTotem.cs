@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Point = System.Tuple<int, int>;
 
 [RequireComponent(typeof(LineRenderer))]
 public class PathfindingTotem : MonoBehaviour
@@ -77,11 +78,11 @@ public class PathfindingTotem : MonoBehaviour
     {
         if (target != null)
         {
-            Tuple<int, int> origxz = new Tuple<int, int>(Mathf.FloorToInt(transform.position.x), Mathf.FloorToInt(transform.position.z));
-            Tuple<int, int> targetxz = new Tuple<int, int>(Mathf.FloorToInt(target.position.x), Mathf.FloorToInt(target.position.z));
+            Point origxz = new Point(Mathf.FloorToInt(transform.position.x), Mathf.FloorToInt(transform.position.z));
+            Point targetxz = new Point(Mathf.FloorToInt(target.position.x), Mathf.FloorToInt(target.position.z));
             System.Diagnostics.Stopwatch w = new System.Diagnostics.Stopwatch();
             w.Start();
-            List<Tuple<int, int>> path = MapPathfinder.GetFastApproximateFullPathFrom(map, origxz, targetxz);
+            List<Point> path = MapPathfinder.GetFastApproximateFullPathFrom(map, origxz, targetxz);
             w.Stop();
             if (path == null || path.Count == 0)
             {
