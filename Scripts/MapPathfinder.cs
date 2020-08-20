@@ -97,10 +97,22 @@ public class MapPathfinder
         return new Path();
     }
 
-    private static void DrawDebugPath(Path[,] pathRecords, int longestPath)
+    private Renderer pathfindingDebugQuad;
+    private void DrawDebugPath(Path[,] pathRecords, int longestPath)
     {
-        GameObject go = GameObject.Find("PathfindingDebugQuad");
-        if (go == null) return;
+        if (pathfindingDebugQuad == null)
+        {
+            GameObject debugObject = GameObject.Find("PathfindingDebugQuad");
+            if (debugObject != null)
+            {
+                pathfindingDebugQuad = debugObject.GetComponent<Renderer>();
+            }
+        }
+        if (pathfindingDebugQuad == null)
+        {
+            return;
+        }
+
         int maxDim = pathRecords.GetLength(0);
 
         Texture2D pathLogger = new Texture2D(maxDim, maxDim);
@@ -114,7 +126,7 @@ public class MapPathfinder
         }
         pathLogger.Apply();
 
-        go.GetComponent<Renderer>().material.mainTexture = pathLogger;
+        pathfindingDebugQuad.material.mainTexture = pathLogger;
     }
     
     /// <summary>
