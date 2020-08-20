@@ -7,30 +7,37 @@ using Point = System.Tuple<int, int>;
 using PointPair = System.Tuple<int, int, int, int>;
 using Path = System.Collections.Generic.List<System.Tuple<int,int>>;
 
-public static class MapPathfinder
+public class MapPathfinder
 {
     private static bool featurePathfindingDebugDraw = true;
-    
+
+    private Heightmap map;
+    public MapPathfinder (Heightmap _map)
+    {
+        map = _map;
+    }
+
     const float maxPointToPointMag = 2500f;
     private static float Magnitude(Point p1, Point p2)
     {
         return Vector2.SqrMagnitude(new Vector2(p1.Item1, p1.Item2) - new Vector2(p2.Item1, p2.Item2));
     }
-    public static List<Point> GetFastApproximateFullPathFrom(Heightmap map, Point origxz, Point targetxz)
+
+    public List<Point> GetFastApproximateFullPathFrom(Point origxz, Point targetxz)
     {
         if (Magnitude(origxz, targetxz) < maxPointToPointMag)
         {
-            return Astar(map, origxz, targetxz, searchSpan: 1);
+            return Astar(origxz, targetxz, searchSpan: 1);
         }
-        return Astar(map, origxz, targetxz, searchSpan: 2);
+        return Astar(origxz, targetxz, searchSpan: 2);
     }
     
-    private static List<Point> Astar(Heightmap map, Point origxz, Point targetxz, int searchSpan)
+    private List<Point> Astar(Point origxz, Point targetxz, int searchSpan)
     {
         SortedDictionary<float, Path> paths = new SortedDictionary<float, Path>();
         paths[0f] = new Path(new Point[] { origxz });
         
-        Path pShort = GetPathRecommendation(map, origxz, targetxz);
+        Path pShort = GetPathRecommendation(origxz, targetxz);
         pShort = null;
         if (pShort != null)
         {
@@ -49,7 +56,7 @@ public static class MapPathfinder
             Path priorityPath = paths[priorityDistance];
             Point priorityTerminus = priorityPath[priorityPath.Count - 1];
 
-            foreach (Point adj in GetAdjacent(maxDim, priorityTerminus, searchSpan))
+            foreach (Point adj in GetAdjacent(priorityTerminus, searchSpan))
             {
                 if (added[adj.Item1, adj.Item2] == null)
                 {
@@ -75,7 +82,7 @@ public static class MapPathfinder
                             DrawDebugPath(added, paths[distanceAdj].Count);
                         }
 
-                        AddPathRecommendation(map, added[adj.Item1, adj.Item2]);
+                        AddPathRecommendation(added[adj.Item1, adj.Item2]);
 
                         return added[adj.Item1, adj.Item2];
                     }
@@ -116,9 +123,10 @@ public static class MapPathfinder
     /// <param name="maxDim">Cell grid size</param>
     /// <param name="p">A point i,j in grid</param>
     /// <returns>A collection of cells adjacent to cell i,j</returns>
-    private static Dictionary<Tuple<int,int,int>, HashSet<Point>> adjCache = new Dictionary<Tuple<int, int, int>, HashSet<Point>>();
-    static IEnumerable<Point> GetAdjacent(int maxDim, Point p, int searchSpan = 1)
+    private Dictionary<Tuple<int,int,int>, HashSet<Point>> adjCache = new Dictionary<Tuple<int, int, int>, HashSet<Point>>();
+    IEnumerable<Point> GetAdjacent(Point p, int searchSpan = 1)
     {
+        int maxDim = map.getMaxDim();
         if (!adjCache.ContainsKey(new Tuple<int,int,int>(p.Item1, p.Item2, searchSpan)))
         {
             adjCache[new Tuple<int, int, int>(p.Item1, p.Item2, searchSpan)] = new HashSet<Point>();
@@ -136,14 +144,14 @@ public static class MapPathfinder
         return adjCache[new Tuple<int,int,int>(p.Item1, p.Item2, searchSpan)];
     }
     
-    private static Dictionary<PointPair, Path> pathCache = new Dictionary<PointPair, Path>();
-    private static void AddPathRecommendation(Heightmap map, Path path)
+    private Dictionary<PointPair, Path> pathCache = new Dictionary<PointPair, Path>();
+    private void AddPathRecommendation(Path path)
     {
         //cache only full length path
         pathCache[new Tuple<int, int, int, int>(path[0].Item1, path[0].Item2, path[path.Count - 1].Item1, path[path.Count - 1].Item2)] = path;
     }
     
-    private static Path GetPathRecommendation(Heightmap map, Point orig, Point target)
+    private Path GetPathRecommendation(Point orig, Point target)
     {
         Tuple<int, int, int, int> t = new PointPair(orig.Item1, orig.Item2, target.Item1, target.Item2);
         if (pathCache.ContainsKey(t))
