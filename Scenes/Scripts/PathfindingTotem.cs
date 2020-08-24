@@ -7,13 +7,10 @@ using Point = System.Tuple<int, int>;
 [RequireComponent(typeof(LineRenderer))]
 public class PathfindingTotem : MonoBehaviour
 {
-    [SerializeField] private Renderer rend;
+    // [SerializeField] private Renderer rend;
     [SerializeField] private LineRenderer lrend;
     [SerializeField] private Transform target;
     [SerializeField] private Heightmap map;
-
-    [Range(64, 512)]
-    [SerializeField] private int dims;
 
     public Heightmap GetMap { get { return map; } }
 
@@ -23,7 +20,7 @@ public class PathfindingTotem : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        map = new Heightmap(dims, dims);
+        int dims = map.getMaxDim();
         var filter_water = MapFilterFactory.GetPerlinBand(dims, dims, 1.0f, 0.4f, 0.43f);
         var filter_exterior = MapFilterFactory.GetBlendedExteriorWeight(dims, dims, 0.5f);
         var filter_lattice = MapFilterFactory.GetPerlinBand(dims, dims, 15.0f, 0.3f, 0.4f);
@@ -66,11 +63,7 @@ public class PathfindingTotem : MonoBehaviour
 
         map.speedTable = speedTable;
 
-        Texture2D tex = map.AsTexture2D(lut);
-        tex.filterMode = FilterMode.Point;
-        tex.Apply();
-
-        rend.material.mainTexture = tex;
+        map.AsTexture2D(lut);
     }
 
     // Update is called once per frame

@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Heightmap
+public class Heightmap : MonoBehaviour
 {
-    private int dim1;
-    private int dim2;
-    
+    [SerializeField, Range(64, 512)] private int dim1;
+    [SerializeField, Range(64, 512)] private int dim2;
+
+    private Renderer rend;
+
     /// <summary>
     /// Gets dimension of the map.
     /// </summary>
@@ -35,12 +37,9 @@ public class Heightmap
     public HeightmapSpeedLookupTable speedTable { get; set; }
 
     private Dictionary<int, HashSet<Tuple<int, int>>> points = new Dictionary<int, HashSet<Tuple<int, int>>>();
-
-    public Heightmap(int _dim1, int _dim2)
+    
+    private void Start()
     {
-        dim1 = _dim1;
-        dim2 = _dim2;
-        
         points[-1] = new HashSet<Tuple<int, int>>();
 
         for (int i = 0; i < dim1; i++)
@@ -178,8 +177,18 @@ public class Heightmap
         }
 
         tex.SetPixels(colors);
-        
+        tex.filterMode = FilterMode.Point;
         tex.Apply();
+
+        if (rend == null)
+        {
+            rend = GetComponent<Renderer>();
+        }
+        if (rend != null)
+        {
+            rend.material.mainTexture = tex;
+        }
+
         return tex;
     }
 }
