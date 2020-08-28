@@ -17,7 +17,7 @@ public class PathfindingTotem : MonoBehaviour
 
     public Heightmap GetMap { get { return map; } }
 
-    HeightmapColorLookupTable lut;
+    [SerializeField] HeightmapColorLookupTable lut;
     public HeightmapColorLookupTable GetLut { get { return lut; } }
 
     // Start is called before the first frame update
@@ -39,6 +39,7 @@ public class PathfindingTotem : MonoBehaviour
         map.MapFromTo(1, 8, filter_forests);
         map.MapFromTo(1, 7, filter_plains);
 
+        /*
         Dictionary<int, Color> mapping = new Dictionary<int, Color>()
         {
             { 0, Color.red },
@@ -51,6 +52,7 @@ public class PathfindingTotem : MonoBehaviour
             {1, Color.white }
         };
         lut = new HeightmapColorLookupTable(mapping);
+        */
 
         HeightmapSpeedLookupTable speedTable = new HeightmapSpeedLookupTable
         {

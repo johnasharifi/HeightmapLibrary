@@ -1085,6 +1085,12 @@ MonoBehaviour:
   lrend: {fileID: 638099777}
   target: {fileID: 502540252}
   dims: 128
+  lut:
+    m_keys: 000000000200000003000000
+    m_values:
+    - {r: 0.7735849, g: 0.12771447, b: 0.12771447, a: 1}
+    - {r: 0.2942721, g: 0.9811321, b: 0.18974723, a: 1}
+    - {r: 0, g: 0.2096392, b: 0.9811321, a: 1}
 --- !u!120 &638099777
 LineRenderer:
   m_ObjectHideFlags: 0

@@ -6,33 +6,63 @@ using UnityEngine;
 /// Serializable class for defining colors of biomes in a Heightmap.
 /// 
 /// Important for defining a custom UI for this serializable type.
+/// 
+/// Requires a SortedDictionary for normal operations, and serializable Lists for serializable operations.
 /// </summary>
-[SerializeField]
+[System.Serializable]
 public class HeightmapColorLookupTable
 {
-    private HashSet<int> uncontainedKeyCollection = new HashSet<int>();
-    private Dictionary<int, Color> mapper = new Dictionary<int, Color>();
+    [SerializeField, HideInInspector] private List<int> m_keys = new List<int>();
+    [SerializeField, HideInInspector] private List<Color> m_values = new List<Color>();
 
-    public HeightmapColorLookupTable(Dictionary<int, Color> _mapping)
+    public void Remove(int index)
     {
-        // acquire definitions from user-specified mapping
-        mapper = _mapping;
+        if (index <= m_keys.Count)
+            m_keys.RemoveAt(index);
+        if (index <= m_values.Count)
+            m_values.RemoveAt(index);
+    }
+    
+    public List<int> Keys
+    {
+        get
+        {
+            return m_keys;
+        }
     }
 
+    public List<Color> Values
+    {
+        get
+        {
+            return m_values;
+        }
+    }
+    
     public Color this[int i]
     {
         get
         {
-            if (mapper.ContainsKey(i))
+            for (int index = 0; index < m_keys.Count; index++)
             {
-                return mapper[i];
-            }
-            if (!uncontainedKeyCollection.Contains(i))
-            {
-                uncontainedKeyCollection.Add(i);
-                Debug.LogErrorFormat("Undefined color mapping for {0}", i);
+                if (m_keys[index] == i)
+                    return m_values[index];
             }
             return default;
+        }
+        set
+        {
+            for (int index = 0; index < m_keys.Count; index++)
+            {
+                if (m_keys[index] == i)
+                {
+                    m_values[index] = value;
+                    return;
+                }
+            }
+            
+            m_keys.Add(i);
+            m_values.Add(value);
         }
     }
 }

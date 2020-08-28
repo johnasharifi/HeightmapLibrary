@@ -65,7 +65,9 @@ public class HeightmapToTexture : MonoBehaviour
             { -1, Color.white },
             {1, Color.white }
         };
-        HeightmapColorLookupTable lut = new HeightmapColorLookupTable(mapping);
+        // TODO re-specify mapping
+        // HeightmapColorLookupTable lut = new HeightmapColorLookupTable();
+        HeightmapColorLookupTable lut = new HeightmapColorLookupTable();
 
         Texture2D tex = map.AsTexture2D(lut);
         tex.filterMode = FilterMode.Point;
