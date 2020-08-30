@@ -10,24 +10,46 @@ using UnityEngine;
 /// Requires a SortedDictionary for normal operations, and serializable Lists for serializable operations.
 /// </summary>
 [System.Serializable]
-public class HeightmapColorLookupTable
+public class HeightmapColorLookupTable: ISerializationCallbackReceiver
 {
     [SerializeField, HideInInspector] private List<int> m_keys = new List<int>();
     [SerializeField, HideInInspector] private List<Color> m_values = new List<Color>();
 
-    public void Remove(int index)
-    {
-        if (index <= m_keys.Count)
-            m_keys.RemoveAt(index);
-        if (index <= m_values.Count)
-            m_values.RemoveAt(index);
-    }
+    private Dictionary<int, Color> keyColorPairs = new Dictionary<int, Color>();
     
+    /// <summary>
+    /// Removes key from known key-color pairs.
+    /// </summary>
+    /// <param name="key">A key to remove</param>
+    public void Remove(int key)
+    {
+        if (keyColorPairs.ContainsKey(key))
+        {
+            keyColorPairs.Remove(key);
+        }
+    }
+
+    public void OnBeforeSerialize()
+    {
+        // before writing, convert data in table into serializable collections
+        m_keys = new List<int>(keyColorPairs.Keys);
+        m_values = new List<Color>(keyColorPairs.Values);
+    }
+
+    public void OnAfterDeserialize()
+    {
+        // after reading in from serializable List<int>/List<Color>, resume using authoritative dictionary
+        for(int i = 0; i < m_keys.Count; i++)
+        {
+            keyColorPairs[m_keys[i]] = m_values[i];
+        }
+    }
+
     public List<int> Keys
     {
         get
         {
-            return m_keys;
+            return new List<int>(keyColorPairs.Keys);
         }
     }
 
@@ -35,7 +57,7 @@ public class HeightmapColorLookupTable
     {
         get
         {
-            return m_values;
+            return new List<Color>(keyColorPairs.Values);
         }
     }
     
@@ -43,26 +65,15 @@ public class HeightmapColorLookupTable
     {
         get
         {
-            for (int index = 0; index < m_keys.Count; index++)
+            if (keyColorPairs.ContainsKey(i))
             {
-                if (m_keys[index] == i)
-                    return m_values[index];
+                return keyColorPairs[i];
             }
             return default;
         }
         set
         {
-            for (int index = 0; index < m_keys.Count; index++)
-            {
-                if (m_keys[index] == i)
-                {
-                    m_values[index] = value;
-                    return;
-                }
-            }
-            
-            m_keys.Add(i);
-            m_values.Add(value);
+            keyColorPairs[i] = value;
         }
     }
 }
