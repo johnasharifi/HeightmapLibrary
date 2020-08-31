@@ -8,7 +8,9 @@ public class HeightmapToTexture : MonoBehaviour
 
     [Range(64, 512)]
     [SerializeField] private int dims;
-    
+
+    [SerializeField] private HeightmapColorLookupTable lut = new HeightmapColorLookupTable();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -53,19 +55,6 @@ public class HeightmapToTexture : MonoBehaviour
             TickMaster.AddAction(interval, a);
         };
         map.ApplyFunctionTo(7, spawnMapEntitiesOnPlains);
-
-        Dictionary<int, Color> mapping = new Dictionary<int, Color>()
-        {
-            { 0, Color.red },
-            { 5, Color.blue },
-            { 7, Color.yellow },
-            { 8, Color.green},
-            { 9, Color.red},
-            { 10, Color.white},
-            { -1, Color.white },
-            {1, Color.white }
-        };
-        HeightmapColorLookupTable lut = new HeightmapColorLookupTable(mapping);
 
         Texture2D tex = map.AsTexture2D(lut);
         tex.filterMode = FilterMode.Point;
