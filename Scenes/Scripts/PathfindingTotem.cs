@@ -39,21 +39,6 @@ public class PathfindingTotem : MonoBehaviour
         map.MapFromTo(1, 8, filter_forests);
         map.MapFromTo(1, 7, filter_plains);
 
-        /*
-        Dictionary<int, Color> mapping = new Dictionary<int, Color>()
-        {
-            { 0, Color.red },
-            { 5, Color.blue },
-            { 7, Color.yellow },
-            { 8, Color.green},
-            { 9, Color.red},
-            { 10, Color.white},
-            { -1, Color.white },
-            {1, Color.white }
-        };
-        lut = new HeightmapColorLookupTable(mapping);
-        */
-
         HeightmapSpeedLookupTable speedTable = new HeightmapSpeedLookupTable
         {
             {0, 0.1f },

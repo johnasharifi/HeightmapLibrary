@@ -68,9 +68,6 @@ public class HeightmapColorLookupTableDrawer : PropertyDrawer
             propertyLut[nextInd] = Color.white;
         }
         
-        // fieldInfo.SetValue(property.serializedObject.targetObject, propertyLut);
-        // Set indent back to what it was
-
         EditorGUI.indentLevel = indent;
 
         EditorGUI.EndProperty();

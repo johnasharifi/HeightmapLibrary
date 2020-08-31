@@ -45,6 +45,9 @@ public class HeightmapColorLookupTable: ISerializationCallbackReceiver
         }
     }
 
+    /// <summary>
+    /// Get a list of keys within this collection.
+    /// </summary>
     public List<int> Keys
     {
         get
@@ -53,6 +56,9 @@ public class HeightmapColorLookupTable: ISerializationCallbackReceiver
         }
     }
 
+    /// <summary>
+    /// Get a list of values within this collection.
+    /// </summary>
     public List<Color> Values
     {
         get
@@ -61,6 +67,11 @@ public class HeightmapColorLookupTable: ISerializationCallbackReceiver
         }
     }
     
+    /// <summary>
+    /// Setter and getter using index operator.
+    /// </summary>
+    /// <param name="i">A key</param>
+    /// <returns>A Color paired to that key</returns>
     public Color this[int i]
     {
         get
