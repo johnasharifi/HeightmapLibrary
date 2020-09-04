@@ -6,33 +6,85 @@ using UnityEngine;
 /// Serializable class for defining colors of biomes in a Heightmap.
 /// 
 /// Important for defining a custom UI for this serializable type.
+/// 
+/// Requires a SortedDictionary for normal operations, and serializable Lists for serializable operations.
 /// </summary>
-[SerializeField]
-public class HeightmapColorLookupTable
+[System.Serializable]
+public class HeightmapColorLookupTable: ISerializationCallbackReceiver
 {
-    private HashSet<int> uncontainedKeyCollection = new HashSet<int>();
-    private Dictionary<int, Color> mapper = new Dictionary<int, Color>();
+    [SerializeField, HideInInspector] private List<int> m_keys = new List<int>();
+    [SerializeField, HideInInspector] private List<Color> m_values = new List<Color>();
 
-    public HeightmapColorLookupTable(Dictionary<int, Color> _mapping)
+    private Dictionary<int, Color> keyColorPairs = new Dictionary<int, Color>();
+    
+    /// <summary>
+    /// Removes key from known key-color pairs.
+    /// </summary>
+    /// <param name="key">A key to remove</param>
+    public void Remove(int key)
     {
-        // acquire definitions from user-specified mapping
-        mapper = _mapping;
+        if (keyColorPairs.ContainsKey(key))
+        {
+            keyColorPairs.Remove(key);
+        }
     }
 
+    public void OnBeforeSerialize()
+    {
+        // before writing, convert data in table into serializable collections
+        m_keys = new List<int>(keyColorPairs.Keys);
+        m_values = new List<Color>(keyColorPairs.Values);
+    }
+
+    public void OnAfterDeserialize()
+    {
+        // after reading in from serializable List<int>/List<Color>, resume using authoritative dictionary
+        for(int i = 0; i < m_keys.Count; i++)
+        {
+            keyColorPairs[m_keys[i]] = m_values[i];
+        }
+    }
+
+    /// <summary>
+    /// Get a list of keys within this collection.
+    /// </summary>
+    public List<int> Keys
+    {
+        get
+        {
+            return new List<int>(keyColorPairs.Keys);
+        }
+    }
+
+    /// <summary>
+    /// Get a list of values within this collection.
+    /// </summary>
+    public List<Color> Values
+    {
+        get
+        {
+            return new List<Color>(keyColorPairs.Values);
+        }
+    }
+    
+    /// <summary>
+    /// Setter and getter using index operator.
+    /// </summary>
+    /// <param name="i">A key</param>
+    /// <returns>A Color paired to that key</returns>
     public Color this[int i]
     {
         get
         {
-            if (mapper.ContainsKey(i))
+            if (keyColorPairs.ContainsKey(i))
             {
-                return mapper[i];
-            }
-            if (!uncontainedKeyCollection.Contains(i))
-            {
-                uncontainedKeyCollection.Add(i);
-                Debug.LogErrorFormat("Undefined color mapping for {0}", i);
+                return keyColorPairs[i];
             }
             return default;
+        }
+        set
+        {
+            keyColorPairs[i] = value;
         }
     }
 }

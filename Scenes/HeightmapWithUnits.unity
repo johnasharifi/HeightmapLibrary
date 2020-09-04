@@ -154,6 +154,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rend: {fileID: 108853331}
   dims: 128
+  lut:
+    m_keys: ffffffff00000000050000000700000008000000090000000a00000001000000
+    m_values:
+    - {r: 1, g: 1, b: 1, a: 1}
+    - {r: 1, g: 0, b: 0, a: 1}
+    - {r: 0, g: 0.12101189, b: 0.99215686, a: 1}
+    - {r: 1, g: 0.66914827, b: 0, a: 1}
+    - {r: 0.12991944, g: 0.5660378, b: 0.056069776, a: 1}
+    - {r: 1, g: 0, b: 0, a: 1}
+    - {r: 1, g: 1, b: 1, a: 1}
+    - {r: 1, g: 1, b: 1, a: 1}
 --- !u!64 &108853330
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -324,6 +335,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fea76b0a9bae704ebb9007757f76300, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myCamera: {fileID: 0}
   translateSpeed: 5
   zoomSpeed: 5
 --- !u!1 &1081922824
