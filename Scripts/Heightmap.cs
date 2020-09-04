@@ -10,6 +10,8 @@ public class Heightmap : MonoBehaviour
 
     private Renderer rend;
 
+    [SerializeField] private HeightmapColorLookupTable lut = new HeightmapColorLookupTable();
+
     /// <summary>
     /// Gets dimension of the map.
     /// </summary>
@@ -163,6 +165,7 @@ public class Heightmap : MonoBehaviour
     /// </summary>
     /// <param name="mapping">Specifies a mapping from integer to Color</param>
     /// <returns>A Texture2D on GPU</returns>
+    [Obsolete("Heightmap component should have a color table")]
     public Texture2D AsTexture2D(HeightmapColorLookupTable mapping)
     {
         Texture2D tex = new Texture2D(dim1, dim2);
@@ -190,5 +193,39 @@ public class Heightmap : MonoBehaviour
         }
 
         return tex;
+    }
+
+    /// <summary>
+    /// Given heightmap color lookup table,
+    /// 
+    /// Creates a Texture2D from the heightmap's height and heightmap color lookup table.
+    /// 
+    /// Sets rend's main texture to be the heightmap's texture.
+    /// </summary>
+    public void DrawMapOnRenderer()
+    {
+        Texture2D tex = new Texture2D(dim1, dim2);
+        Color[] colors = new Color[dim1 * dim2];
+
+        foreach (KeyValuePair<int, HashSet<Tuple<int, int>>> kvp in points)
+        {
+            foreach (Tuple<int, int> point in kvp.Value)
+            {
+                colors[point.Item2 * dim1 + point.Item1] = lut[kvp.Key];
+            }
+        }
+
+        tex.SetPixels(colors);
+        tex.filterMode = FilterMode.Point;
+        tex.Apply();
+
+        if (rend == null)
+        {
+            rend = GetComponent<Renderer>();
+        }
+        if (rend != null)
+        {
+            rend.material.mainTexture = tex;
+        }
     }
 }

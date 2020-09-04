@@ -200,6 +200,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dim1: 128
   dim2: 128
+  lut:
+    m_keys: 05000000000000000700000008000000090000000a000000ffffffff01000000
+    m_values:
+    - {r: 0, g: 0.16630888, b: 1, a: 1}
+    - {r: 1, g: 1, b: 1, a: 1}
+    - {r: 0.98039216, g: 0.10633053, b: 0.031372555, a: 1}
+    - {r: 1, g: 0.43569475, b: 0, a: 1}
+    - {r: 0.027951002, g: 1, b: 0, a: 1}
+    - {r: 1, g: 0, b: 0, a: 1}
+    - {r: 1, g: 1, b: 1, a: 1}
+    - {r: 1, g: 1, b: 1, a: 1}
 --- !u!64 &108853330
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1099,7 +1110,6 @@ MonoBehaviour:
   lrend: {fileID: 638099777}
   target: {fileID: 502540252}
   map: {fileID: 108853329}
-  dims: 128
   lut:
     m_keys: 00000000050000000700000008000000090000000a000000ffffffff01000000
     m_values:
