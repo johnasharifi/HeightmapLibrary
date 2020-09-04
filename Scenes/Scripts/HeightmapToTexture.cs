@@ -14,7 +14,8 @@ public class HeightmapToTexture : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Heightmap map = new Heightmap(dims, dims);
+        // Heightmap map = new Heightmap(dims, dims);
+        Heightmap map = rend.GetComponent<Heightmap>();
 
         var filter_water = MapFilterFactory.GetPerlinBand(dims, dims, 1.0f, 0.4f, 0.43f);
         var filter_exterior = MapFilterFactory.GetBlendedExteriorWeight(dims, dims, 0.5f);

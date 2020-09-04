@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Heightmap
+public class Heightmap : MonoBehaviour
 {
-    private int dim1;
-    private int dim2;
-    
+    [SerializeField, Range(64, 512)] private int dim1;
+    [SerializeField, Range(64, 512)] private int dim2;
+
+    private Renderer rend;
+
+    [SerializeField] private HeightmapColorLookupTable lut = new HeightmapColorLookupTable();
+
     /// <summary>
     /// Gets dimension of the map.
     /// </summary>
@@ -35,12 +39,9 @@ public class Heightmap
     public HeightmapSpeedLookupTable speedTable { get; set; }
 
     private Dictionary<int, HashSet<Tuple<int, int>>> points = new Dictionary<int, HashSet<Tuple<int, int>>>();
-
-    public Heightmap(int _dim1, int _dim2)
+    
+    private void Start()
     {
-        dim1 = _dim1;
-        dim2 = _dim2;
-        
         points[-1] = new HashSet<Tuple<int, int>>();
 
         for (int i = 0; i < dim1; i++)
@@ -164,6 +165,7 @@ public class Heightmap
     /// </summary>
     /// <param name="mapping">Specifies a mapping from integer to Color</param>
     /// <returns>A Texture2D on GPU</returns>
+    [Obsolete("Heightmap component should have a color table")]
     public Texture2D AsTexture2D(HeightmapColorLookupTable mapping)
     {
         Texture2D tex = new Texture2D(dim1, dim2);
@@ -178,8 +180,52 @@ public class Heightmap
         }
 
         tex.SetPixels(colors);
-        
+        tex.filterMode = FilterMode.Point;
         tex.Apply();
+
+        if (rend == null)
+        {
+            rend = GetComponent<Renderer>();
+        }
+        if (rend != null)
+        {
+            rend.material.mainTexture = tex;
+        }
+
         return tex;
+    }
+
+    /// <summary>
+    /// Given heightmap color lookup table,
+    /// 
+    /// Creates a Texture2D from the heightmap's height and heightmap color lookup table.
+    /// 
+    /// Sets rend's main texture to be the heightmap's texture.
+    /// </summary>
+    public void DrawMapOnRenderer()
+    {
+        Texture2D tex = new Texture2D(dim1, dim2);
+        Color[] colors = new Color[dim1 * dim2];
+
+        foreach (KeyValuePair<int, HashSet<Tuple<int, int>>> kvp in points)
+        {
+            foreach (Tuple<int, int> point in kvp.Value)
+            {
+                colors[point.Item2 * dim1 + point.Item1] = lut[kvp.Key];
+            }
+        }
+
+        tex.SetPixels(colors);
+        tex.filterMode = FilterMode.Point;
+        tex.Apply();
+
+        if (rend == null)
+        {
+            rend = GetComponent<Renderer>();
+        }
+        if (rend != null)
+        {
+            rend.material.mainTexture = tex;
+        }
     }
 }
