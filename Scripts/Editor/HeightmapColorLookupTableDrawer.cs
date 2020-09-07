@@ -22,7 +22,7 @@ public class HeightmapColorLookupTableDrawer : PropertyDrawer
         const float textWidthPercent = 0.3f;
         const float textColorPercent = 0.6f;
         const float textRemovePercent = 0.1f;
-
+        
         Undo.RecordObject(property.serializedObject.targetObject, "name");
 
         // Using BeginProperty / EndProperty on the parent property means that
@@ -40,6 +40,17 @@ public class HeightmapColorLookupTableDrawer : PropertyDrawer
 
         Rect rectNextKeyAdd = new Rect(position.x + position.width * textWidthPercent, position.y + (propertyLut.Keys.Count) * lineHeight, position.width * (1.0f - textWidthPercent), lineHeight);
         Rect rectNextKeyInput = new Rect(position.x, position.y + (propertyLut.Keys.Count) * lineHeight, position.width * textWidthPercent, lineHeight);
+
+        if (propertyLut.Keys.Count == 0)
+        {
+            Rect rectObjectInput = new Rect(position.x, position.y + 1 * lineHeight, position.width, lineHeight);
+
+            TextAsset textAsset = (TextAsset) EditorGUI.ObjectField(rectObjectInput, "Color lookup table json", null, typeof(TextAsset), false);
+            if (textAsset != null)
+            {
+                propertyLut.Overwrite(textAsset.text);
+            }
+        }
 
         for (int i = 0; i < propertyLut.Keys.Count; i++)
         {
