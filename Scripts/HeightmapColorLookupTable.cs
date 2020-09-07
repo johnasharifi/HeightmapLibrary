@@ -16,7 +16,23 @@ public class HeightmapColorLookupTable: ISerializationCallbackReceiver
     [SerializeField, HideInInspector] private List<Color> m_values = new List<Color>();
 
     private Dictionary<int, Color> keyColorPairs = new Dictionary<int, Color>();
-    
+
+    /// <summary>
+    /// Triggers OnBeforeSerialize. Then applies serialized json data to this object. 
+    /// </summary>
+    /// <param name="text">Text which contains json-format data which will populate m_keys / m_values</param>
+    public void Overwrite(string text)
+    {
+        try
+        {
+            JsonUtility.FromJsonOverwrite(text, this);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogFormat("Error while parsing {0}:\n{1}", text, e);
+        }
+    }
+
     /// <summary>
     /// Removes key from known key-color pairs.
     /// </summary>
