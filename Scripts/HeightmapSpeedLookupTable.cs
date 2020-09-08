@@ -9,6 +9,7 @@ using UnityEngine;
 /// - unit type
 /// - local effects
 /// </summary>
+[System.Serializable]
 public class HeightmapSpeedLookupTable : HeightmapLookupTable<float>
 {
 }
