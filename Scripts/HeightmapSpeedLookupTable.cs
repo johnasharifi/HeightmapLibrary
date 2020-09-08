@@ -9,17 +9,7 @@ using UnityEngine;
 /// - unit type
 /// - local effects
 /// </summary>
-public class HeightmapSpeedLookupTable : Dictionary<int, float>
+[System.Serializable]
+public class HeightmapSpeedLookupTable : HeightmapLookupTable<float>
 {
-    private const float minMoveSpeed = 0.001f;
-
-    public float GetTraversalCost(int terrain)
-    {
-        if (!this.ContainsKey(terrain))
-        {
-            Debug.LogFormat("Warning: move speed for terrain {0} undefined", terrain);
-            return 1.0f / minMoveSpeed;
-        }
-        return 1.0f / this[terrain];
-    }
 }
