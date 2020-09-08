@@ -36,6 +36,8 @@ public class PathfindingTotem : MonoBehaviour
         map.MapFromTo(1, 8, filter_forests);
         map.MapFromTo(1, 7, filter_plains);
 
+        // TODO
+        /*
         HeightmapSpeedLookupTable speedTable = new HeightmapSpeedLookupTable
         {
             {0, 0.1f },
@@ -49,6 +51,7 @@ public class PathfindingTotem : MonoBehaviour
         };
 
         map.speedTable = speedTable;
+        */
 
         map.AsTexture2D(lut);
     }

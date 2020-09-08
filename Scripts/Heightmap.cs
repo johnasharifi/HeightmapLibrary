@@ -11,6 +11,7 @@ public class Heightmap : MonoBehaviour
     private Renderer rend;
 
     [SerializeField] private HeightmapColorLookupTable lut = new HeightmapColorLookupTable();
+    [SerializeField] private HeightmapSpeedLookupTable m_speedLookupTable = new HeightmapSpeedLookupTable();
 
     /// <summary>
     /// Gets dimension of the map.
@@ -35,8 +36,17 @@ public class Heightmap : MonoBehaviour
     {
         return Mathf.Max(dim1, dim2);
     }
-    
-    public HeightmapSpeedLookupTable speedTable { get; set; }
+
+    /// <summary>
+    /// Getter for a speed lookup table.
+    /// </summary>
+    public HeightmapSpeedLookupTable speedLookupTable
+    {
+        get
+        {
+            return m_speedLookupTable;
+        }
+    }
 
     private Dictionary<int, HashSet<Tuple<int, int>>> points = new Dictionary<int, HashSet<Tuple<int, int>>>();
     
