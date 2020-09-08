@@ -12,9 +12,12 @@ public class PathfindingTotem : MonoBehaviour
     [SerializeField] private Transform target;
     [SerializeField] private Heightmap map;
 
+    // TODO convert to ref
     public Heightmap GetMap { get { return map; } }
 
+    // TODO remove
     [SerializeField] HeightmapColorLookupTable lut;
+    // TODO remove
     public HeightmapColorLookupTable GetLut { get { return lut; } }
 
     // Start is called before the first frame update
