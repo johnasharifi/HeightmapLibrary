@@ -30,7 +30,7 @@ public class HeightmapColorLookupTableDrawer : PropertyDrawer
         EditorGUI.BeginProperty(position, label, property);
 
         // Draw label
-        position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
+        position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Color lookup table"));
 
         // Don't make child fields be indented
         var indent = EditorGUI.indentLevel;
