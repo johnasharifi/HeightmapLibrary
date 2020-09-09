@@ -200,6 +200,49 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dim1: 128
   dim2: 128
+  m_biomeFilterTable:
+  - originClass: -1
+    targetClass: 5
+    failClass: -1
+    predicateType: 1
+    predicatePerlinScale: 1
+    predicateThresholdA: 0.4
+    predicateThresholdB: 0.43
+  - originClass: -1
+    targetClass: 10
+    failClass: -1
+    predicateType: 1
+    predicatePerlinScale: 15
+    predicateThresholdA: 0.3
+    predicateThresholdB: 0.4
+  - originClass: 1
+    targetClass: 0
+    failClass: 1
+    predicateType: 0
+    predicatePerlinScale: 0.5
+    predicateThresholdA: 0
+    predicateThresholdB: 0
+  - originClass: 1
+    targetClass: 9
+    failClass: 1
+    predicateType: 1
+    predicatePerlinScale: 5
+    predicateThresholdA: 0.4
+    predicateThresholdB: 0.5
+  - originClass: 1
+    targetClass: 8
+    failClass: 1
+    predicateType: 1
+    predicatePerlinScale: 10
+    predicateThresholdA: 0.4
+    predicateThresholdB: 0.5
+  - originClass: 1
+    targetClass: 7
+    failClass: 1
+    predicateType: 1
+    predicatePerlinScale: 5
+    predicateThresholdA: 0.4
+    predicateThresholdB: 0.5
   lut:
     m_keys: 05000000000000000700000008000000090000000a000000ffffffff01000000
     m_values:

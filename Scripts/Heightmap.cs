@@ -10,9 +10,10 @@ public class Heightmap : MonoBehaviour
 
     private Renderer rend;
 
+    [SerializeField] private List<HeightmapBiomeFilter> m_biomeFilterTable = new List<HeightmapBiomeFilter>();
     [SerializeField] private HeightmapColorLookupTable lut = new HeightmapColorLookupTable();
     [SerializeField] private HeightmapSpeedLookupTable m_speedLookupTable = new HeightmapSpeedLookupTable();
-
+    
     /// <summary>
     /// Gets dimension of the map.
     /// </summary>
