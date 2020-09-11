@@ -62,6 +62,24 @@ public class Heightmap : MonoBehaviour
                 points[-1].Add(new Tuple<int, int>(i, j));
             }
         }
+
+        foreach (HeightmapBiomeFilter filter in m_biomeFilterTable)
+        {
+            if (HeightmapBiomeFilter.IsBlendedExterior(filter.predicateType)) {
+                Debug.LogFormat("filter is blended");
+                Func<int, int, bool> mapFunc = MapFilterFactory.GetBlendedExteriorWeight(dim1, dim2, filter.predicateThresholdA);
+
+                this.MapFromTo(filter.originClass, filter.targetClass, filter.failClass, mapFunc);
+            }
+            else
+            {
+                Func<int, int, bool> mapFunc = MapFilterFactory.GetPerlinBand(dim1, dim2, filter.predicatePerlinScale, filter.predicateThresholdA, filter.predicateThresholdB);
+                this.MapFromTo(filter.originClass, filter.targetClass, filter.failClass, mapFunc);
+            }
+        }
+
+        Debug.LogFormat("mapped");
+        DrawMapOnRenderer();
     }
 
     public void ApplyFunctionTo(int originClass, Action<int, int> function)

@@ -56,7 +56,7 @@ public class PathfindingTotem : MonoBehaviour
         map.speedTable = speedTable;
         */
 
-        map.AsTexture2D(lut);
+        // map.AsTexture2D(lut);
     }
 
     // Update is called once per frame
