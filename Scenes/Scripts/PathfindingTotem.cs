@@ -11,54 +11,10 @@ public class PathfindingTotem : MonoBehaviour
     [SerializeField] private LineRenderer lrend;
     [SerializeField] private Transform target;
     [SerializeField] private Heightmap map;
-
-    // TODO convert to ref
-    public Heightmap GetMap { get { return map; } }
-
-    // TODO remove
-    [SerializeField] HeightmapColorLookupTable lut;
-    // TODO remove
-    public HeightmapColorLookupTable GetLut { get { return lut; } }
-
+    
     // Start is called before the first frame update
     void Start()
     {
-        /*
-        int dims = map.getMaxDim();
-        var filter_water = MapFilterFactory.GetPerlinBand(dims, dims, 1.0f, 0.4f, 0.43f);
-        var filter_exterior = MapFilterFactory.GetBlendedExteriorWeight(dims, dims, 0.5f);
-        var filter_lattice = MapFilterFactory.GetPerlinBand(dims, dims, 15.0f, 0.3f, 0.4f);
-        var filter_mountains = MapFilterFactory.GetPerlinBand(dims, dims, 5.0f, 0.4f, 0.5f);
-        var filter_forests = MapFilterFactory.GetPerlinBand(dims, dims, 10.0f, 0.4f, 0.5f);
-        var filter_plains = MapFilterFactory.GetPerlinBand(dims, dims, 5.0f, 0.4f, 0.5f);
-
-        map.MapFromTo(-1, 5, -1, filter_water);
-        map.MapFromTo(-1, 10, 1, filter_lattice);
-        map.MapFromTo(1, 0, 1, filter_exterior);
-
-        map.MapFromTo(1, 9, filter_mountains);
-        map.MapFromTo(1, 8, filter_forests);
-        map.MapFromTo(1, 7, filter_plains);
-        */
-
-        // TODO
-        /*
-        HeightmapSpeedLookupTable speedTable = new HeightmapSpeedLookupTable
-        {
-            {0, 0.1f },
-            {5, 0.1f },
-            {7, 1f },
-            {8, 0.5f },
-            {9, 0.1f },
-            {10, 1f },
-            {-1, 0.001f },
-            {1, 1f }
-        };
-
-        map.speedTable = speedTable;
-        */
-
-        // map.AsTexture2D(lut);
     }
 
     // Update is called once per frame
