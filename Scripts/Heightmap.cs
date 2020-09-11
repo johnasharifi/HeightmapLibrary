@@ -66,7 +66,6 @@ public class Heightmap : MonoBehaviour
         foreach (HeightmapBiomeFilter filter in m_biomeFilterTable)
         {
             if (HeightmapBiomeFilter.IsBlendedExterior(filter.predicateType)) {
-                Debug.LogFormat("filter is blended");
                 Func<int, int, bool> mapFunc = MapFilterFactory.GetBlendedExteriorWeight(dim1, dim2, filter.predicateThresholdA);
 
                 this.MapFromTo(filter.originClass, filter.targetClass, filter.failClass, mapFunc);
@@ -77,8 +76,7 @@ public class Heightmap : MonoBehaviour
                 this.MapFromTo(filter.originClass, filter.targetClass, filter.failClass, mapFunc);
             }
         }
-
-        Debug.LogFormat("mapped");
+        
         DrawMapOnRenderer();
     }
 
