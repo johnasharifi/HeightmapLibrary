@@ -55,27 +55,6 @@ public class HeightmapBiomeFilterDrawer : PropertyDrawer
                     break;
             }
         }
-
-        /*
-        SerializedProperty originClassProperty = property.FindPropertyRelative(propertyNames[0]);
-        SerializedProperty targetClassProperty = property.FindPropertyRelative(propertyNames[1]);
-        SerializedProperty failClassProperty = property.FindPropertyRelative(propertyNames[2]);
-        SerializedProperty predciateTypeProperty = property.FindPropertyRelative(propertyNames[3]);
-        SerializedProperty predicatePerlinScaleProperty = property.FindPropertyRelative(propertyNames[4]);
-        SerializedProperty predicateThresholdAProperty = property.FindPropertyRelative(propertyNames[5]);
-        SerializedProperty predicateThresholdBProperty = property.FindPropertyRelative(propertyNames[6]);
-
-        originClassProperty.intValue = EditorGUI.DelayedIntField(rects[0], originClassProperty.intValue);
-        targetClassProperty.intValue = EditorGUI.DelayedIntField(rects[1], targetClassProperty.intValue);
-        failClassProperty.intValue = EditorGUI.DelayedIntField(rects[2], failClassProperty.intValue);
-        predciateTypeProperty.intValue = EditorGUI.Popup(rects[3], predciateTypeProperty.intValue, HeightmapBiomeFilter.predicateTypes);
-        predicatePerlinScaleProperty.floatValue = EditorGUI.DelayedFloatField(rects[4], predicatePerlinScaleProperty.floatValue);
-        if (!HeightmapBiomeFilter.IsBlendedExterior(predciateTypeProperty.intValue))
-        {
-            predicateThresholdAProperty.floatValue = EditorGUI.DelayedFloatField(rects[5], predicateThresholdAProperty.floatValue);
-            predicateThresholdBProperty.floatValue = EditorGUI.DelayedFloatField(rects[6], predicateThresholdBProperty.floatValue);
-        }
-        */
         
         EditorGUI.EndProperty();
 
