@@ -23,6 +23,7 @@ public class PathfindingTotem : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        /*
         int dims = map.getMaxDim();
         var filter_water = MapFilterFactory.GetPerlinBand(dims, dims, 1.0f, 0.4f, 0.43f);
         var filter_exterior = MapFilterFactory.GetBlendedExteriorWeight(dims, dims, 0.5f);
@@ -38,6 +39,7 @@ public class PathfindingTotem : MonoBehaviour
         map.MapFromTo(1, 9, filter_mountains);
         map.MapFromTo(1, 8, filter_forests);
         map.MapFromTo(1, 7, filter_plains);
+        */
 
         // TODO
         /*
@@ -56,7 +58,7 @@ public class PathfindingTotem : MonoBehaviour
         map.speedTable = speedTable;
         */
 
-        map.AsTexture2D(lut);
+        // map.AsTexture2D(lut);
     }
 
     // Update is called once per frame
