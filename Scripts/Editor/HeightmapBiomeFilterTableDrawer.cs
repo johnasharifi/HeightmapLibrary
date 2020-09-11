@@ -16,35 +16,66 @@ public class HeightmapBiomeFilterDrawer : PropertyDrawer
         position = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), new GUIContent("Biome mapping"));
 
         Undo.RecordObject(property.serializedObject.targetObject, "name");
-        
+
         EditorGUI.BeginChangeCheck();
-        
-        Rect origClassRect = new Rect(position.x + position.width * 0.0f, position.y, position.width * 0.1f, position.height);
-        Rect targClassRect = new Rect(position.x + position.width * 0.1f, position.y, position.width * 0.1f, position.height);
-        Rect failClassRect = new Rect(position.x + position.width * 0.2f, position.y, position.width * 0.1f, position.height);
-        Rect predicateClassRect = new Rect(position.x + position.width * 0.3f, position.y, position.width * 0.2f, position.height);
-        Rect predicateFloatRect0 = new Rect(position.x + position.width * 0.5f, position.y, position.width * 0.1f, position.height);
-        Rect predicateFloatRect1 = new Rect(position.x + position.width * 0.6f, position.y, position.width * 0.2f, position.height);
-        Rect predicateFloatRect2 = new Rect(position.x + position.width * 0.8f, position.y, position.width * 0.2f, position.height);
 
-        SerializedProperty originClassProperty = property.FindPropertyRelative("m_originClass");
-        SerializedProperty targetClassProperty = property.FindPropertyRelative("m_targetClass");
-        SerializedProperty failClassProperty = property.FindPropertyRelative("m_failClass");
-        SerializedProperty predciateTypeProperty = property.FindPropertyRelative("m_predicateType");
-        SerializedProperty predicatePerlinScaleProperty = property.FindPropertyRelative("m_predicatePerlinScale");
-        SerializedProperty predicateThresholdAProperty = property.FindPropertyRelative("m_predicateThresholdA");
-        SerializedProperty predicateThresholdBProperty = property.FindPropertyRelative("m_predicateThresholdB");
+        float[] rectWidthPercents = new float[] { 0.0f, 0.1f, 0.2f, 0.3f, 0.5f, 0.6f, 0.8f, 1.0f };
+        string[] propertyNames = new string[] { "m_originClass", "m_targetClass", "m_failClass", "m_predicateType", "m_predicatePerlinScale", "m_predicateThresholdA", "m_predicateThresholdB"};
+        Rect[] rects = new Rect[rectWidthPercents.Length - 1];
+        SerializedProperty predciateTypeProperty = property.FindPropertyRelative(propertyNames[3]);
+        bool isPerlinBlend = !HeightmapBiomeFilter.IsBlendedExterior(predciateTypeProperty.intValue);
 
-        originClassProperty.intValue = EditorGUI.DelayedIntField(origClassRect, originClassProperty.intValue);
-        targetClassProperty.intValue = EditorGUI.DelayedIntField(targClassRect, targetClassProperty.intValue);
-        failClassProperty.intValue = EditorGUI.DelayedIntField(failClassRect, failClassProperty.intValue);
-        predciateTypeProperty.intValue = EditorGUI.Popup(predicateClassRect, predciateTypeProperty.intValue, HeightmapBiomeFilter.predicateTypes);
-        predicatePerlinScaleProperty.floatValue = EditorGUI.DelayedFloatField(predicateFloatRect0, predicatePerlinScaleProperty.floatValue);
+        for (int i = 0; i < rects.Length; i++)
+        {
+            // for perlin blend function, skip drawing m_predicateThresholdA and m_predicateThresholdB. Just draw m_predicatePerlinScale
+            if (i > 4 && !isPerlinBlend)
+                continue;
+
+            float rectStartX = position.x + position.width * rectWidthPercents[i];
+            float rectWidth = position.width * (rectWidthPercents[i + 1] - rectWidthPercents[i]);
+            rects[i] = new Rect(rectStartX, position.y, rectWidth, position.height);
+
+            SerializedProperty propertyI = property.FindPropertyRelative(propertyNames[i]);
+
+            switch (i)
+            {
+                default:
+                case 0:
+                case 1:
+                case 2:
+                    propertyI.intValue = EditorGUI.DelayedIntField(rects[i], propertyI.intValue);
+                    break;
+                case 3:
+                    propertyI.intValue = EditorGUI.Popup(rects[i], propertyI.intValue, HeightmapBiomeFilter.predicateTypes);
+                    break;
+                case 4:
+                case 5:
+                case 6:
+                    propertyI.floatValue = EditorGUI.DelayedFloatField(rects[i], propertyI.floatValue);
+                    break;
+            }
+        }
+
+        /*
+        SerializedProperty originClassProperty = property.FindPropertyRelative(propertyNames[0]);
+        SerializedProperty targetClassProperty = property.FindPropertyRelative(propertyNames[1]);
+        SerializedProperty failClassProperty = property.FindPropertyRelative(propertyNames[2]);
+        SerializedProperty predciateTypeProperty = property.FindPropertyRelative(propertyNames[3]);
+        SerializedProperty predicatePerlinScaleProperty = property.FindPropertyRelative(propertyNames[4]);
+        SerializedProperty predicateThresholdAProperty = property.FindPropertyRelative(propertyNames[5]);
+        SerializedProperty predicateThresholdBProperty = property.FindPropertyRelative(propertyNames[6]);
+
+        originClassProperty.intValue = EditorGUI.DelayedIntField(rects[0], originClassProperty.intValue);
+        targetClassProperty.intValue = EditorGUI.DelayedIntField(rects[1], targetClassProperty.intValue);
+        failClassProperty.intValue = EditorGUI.DelayedIntField(rects[2], failClassProperty.intValue);
+        predciateTypeProperty.intValue = EditorGUI.Popup(rects[3], predciateTypeProperty.intValue, HeightmapBiomeFilter.predicateTypes);
+        predicatePerlinScaleProperty.floatValue = EditorGUI.DelayedFloatField(rects[4], predicatePerlinScaleProperty.floatValue);
         if (!HeightmapBiomeFilter.IsBlendedExterior(predciateTypeProperty.intValue))
         {
-            predicateThresholdAProperty.floatValue = EditorGUI.DelayedFloatField(predicateFloatRect1, predicateThresholdAProperty.floatValue);
-            predicateThresholdBProperty.floatValue = EditorGUI.DelayedFloatField(predicateFloatRect2, predicateThresholdBProperty.floatValue);
+            predicateThresholdAProperty.floatValue = EditorGUI.DelayedFloatField(rects[5], predicateThresholdAProperty.floatValue);
+            predicateThresholdBProperty.floatValue = EditorGUI.DelayedFloatField(rects[6], predicateThresholdBProperty.floatValue);
         }
+        */
         
         EditorGUI.EndProperty();
 
