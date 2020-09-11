@@ -27,13 +27,13 @@ public class HeightmapBiomeFilterDrawer : PropertyDrawer
         Rect predicateFloatRect1 = new Rect(position.x + position.width * 0.6f, position.y, position.width * 0.2f, position.height);
         Rect predicateFloatRect2 = new Rect(position.x + position.width * 0.8f, position.y, position.width * 0.2f, position.height);
 
-        SerializedProperty originClassProperty = property.FindPropertyRelative("originClass");
-        SerializedProperty targetClassProperty = property.FindPropertyRelative("targetClass");
-        SerializedProperty failClassProperty = property.FindPropertyRelative("failClass");
-        SerializedProperty predciateTypeProperty = property.FindPropertyRelative("predicateType");
-        SerializedProperty predicatePerlinScaleProperty = property.FindPropertyRelative("predicatePerlinScale");
-        SerializedProperty predicateThresholdAProperty = property.FindPropertyRelative("predicateThresholdA");
-        SerializedProperty predicateThresholdBProperty = property.FindPropertyRelative("predicateThresholdB");
+        SerializedProperty originClassProperty = property.FindPropertyRelative("m_originClass");
+        SerializedProperty targetClassProperty = property.FindPropertyRelative("m_targetClass");
+        SerializedProperty failClassProperty = property.FindPropertyRelative("m_failClass");
+        SerializedProperty predciateTypeProperty = property.FindPropertyRelative("m_predicateType");
+        SerializedProperty predicatePerlinScaleProperty = property.FindPropertyRelative("m_predicatePerlinScale");
+        SerializedProperty predicateThresholdAProperty = property.FindPropertyRelative("m_predicateThresholdA");
+        SerializedProperty predicateThresholdBProperty = property.FindPropertyRelative("m_predicateThresholdB");
 
         originClassProperty.intValue = EditorGUI.DelayedIntField(origClassRect, originClassProperty.intValue);
         targetClassProperty.intValue = EditorGUI.DelayedIntField(targClassRect, targetClassProperty.intValue);
