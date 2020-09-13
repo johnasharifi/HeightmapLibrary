@@ -2,7 +2,7 @@
 
 ## How to add this library to your Unity project
 
-<img src="https://github.com/johnasharifi/HeightmapLibrary/blob/feature_readme/DemoImages/Readme/HowToAddUnityPackageManager.png" height="24">
+<img src="https://github.com/johnasharifi/HeightmapLibrary/blob/feature_readme/DemoImages/Readme/HowToAddUnityPackageManager.png" height="256">
 
 - Acquire a remote or local repo of the Heightmap Library using git
 - Set up your Unity project, back it up
