@@ -11,5 +11,10 @@
 - Navigate to the Heightmap Library in your file selector
 - Select the package.json within the Heightmap Library
 
-- list item 1
-- list item 2
+## How to use
+
+<img src="https://github.com/johnasharifi/HeightmapLibrary/blob/feature_readme/DemoImages/Readme/HeightmapComponent.png" height="256">
+
+- Attach a Heightmap component to a gameObject
+- Set parameters for biome mapping, biome colors, and biome pathfinding
+- Play
