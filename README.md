@@ -2,7 +2,7 @@
 
 ## How to add this library to your Unity project
 
-![How to use Unity Package Manager to add to Unity project](DemoImages/Readme/HowToAddUnityPackageManager.png)
+![How to use Unity Package Manager to add to Unity project](DemoImages/Readme/HowToAddUnityPackageManager.png | height 400)
 
 - Acquire a remote or local repo of the Heightmap Library using git
 - Set up your Unity project, back it up
