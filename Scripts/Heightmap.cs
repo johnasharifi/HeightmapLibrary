@@ -98,7 +98,7 @@ public class Heightmap : MonoBehaviour
             }
         }
 
-        DrawMapOnRenderer();
+        // DrawMapOnRenderer();
     }
 
     public void ApplyFunctionTo(int originClass, Action<int, int> function)
