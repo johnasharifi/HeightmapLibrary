@@ -13,7 +13,10 @@ public class Heightmap : MonoBehaviour
     [SerializeField] private List<HeightmapBiomeFilter> m_biomeFilterTable = new List<HeightmapBiomeFilter>();
     [SerializeField] private HeightmapColorLookupTable m_colorLookupTable = new HeightmapColorLookupTable();
     [SerializeField] private HeightmapSpeedLookupTable m_speedLookupTable = new HeightmapSpeedLookupTable();
-    
+
+    public delegate void BiomesGenerated(int biome, int x, int z, Color c);
+    public event BiomesGenerated onBiomesGenerated;
+
     /// <summary>
     /// Gets dimension of the map.
     /// </summary>
@@ -85,6 +88,16 @@ public class Heightmap : MonoBehaviour
             }
         }
         
+        for (int i = 0; i < dim1; i++)
+        {
+            for (int j = 0; j < dim2; j++)
+            {
+                int biome = this[i, j];
+                Color color = m_colorLookupTable[biome];
+                onBiomesGenerated?.Invoke(biome, i, j, color);
+            }
+        }
+
         DrawMapOnRenderer();
     }
 
