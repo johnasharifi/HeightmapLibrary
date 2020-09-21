@@ -11,7 +11,7 @@ public class Heightmap : MonoBehaviour
     private Renderer rend;
 
     [SerializeField] private List<HeightmapBiomeFilter> m_biomeFilterTable = new List<HeightmapBiomeFilter>();
-    [SerializeField] private HeightmapColorLookupTable lut = new HeightmapColorLookupTable();
+    [SerializeField] private HeightmapColorLookupTable m_colorLookupTable = new HeightmapColorLookupTable();
     [SerializeField] private HeightmapSpeedLookupTable m_speedLookupTable = new HeightmapSpeedLookupTable();
     
     /// <summary>
@@ -46,6 +46,14 @@ public class Heightmap : MonoBehaviour
         get
         {
             return m_speedLookupTable;
+        }
+    }
+
+    public HeightmapColorLookupTable colorLookupTable
+    {
+        get
+        {
+            return m_colorLookupTable;
         }
     }
 
@@ -238,7 +246,7 @@ public class Heightmap : MonoBehaviour
         {
             foreach (Tuple<int, int> point in kvp.Value)
             {
-                colors[point.Item2 * dim1 + point.Item1] = lut[kvp.Key];
+                colors[point.Item2 * dim1 + point.Item1] = m_colorLookupTable[kvp.Key];
             }
         }
 
