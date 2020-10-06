@@ -9,8 +9,8 @@ public class Heightmap : MonoBehaviour
     [SerializeField, Range(64, 512)] private int dim2;
 
     private Renderer rend;
-
-    [SerializeField] private List<HeightmapBiomeFilter> m_biomeFilterTable = new List<HeightmapBiomeFilter>();
+    
+    [SerializeField] private HeightmapBiomeFilterLookupTable m_biomeFilterLookupTable = new HeightmapBiomeFilterLookupTable();
     [SerializeField] private HeightmapColorLookupTable m_colorLookupTable = new HeightmapColorLookupTable();
     [SerializeField] private HeightmapSpeedLookupTable m_speedLookupTable = new HeightmapSpeedLookupTable();
 
@@ -74,7 +74,7 @@ public class Heightmap : MonoBehaviour
             }
         }
 
-        foreach (HeightmapBiomeFilter filter in m_biomeFilterTable)
+        foreach (HeightmapBiomeFilter filter in m_biomeFilterLookupTable)
         {
             if (HeightmapBiomeFilter.IsBlendedExterior(filter.predicateType)) {
                 Func<int, int, bool> mapFunc = MapFilterFactory.GetBlendedExteriorWeight(dim1, dim2, filter.predicateThresholdA);
