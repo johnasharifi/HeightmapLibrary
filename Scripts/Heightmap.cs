@@ -68,14 +68,6 @@ public class Heightmap : MonoBehaviour
         }
     }
 
-    public IEnumerable<int> biomes
-    {
-        get
-        {
-            return points.Keys;
-        }
-    }
-
     private Dictionary<int, HashSet<Tuple<int, int>>> points = new Dictionary<int, HashSet<Tuple<int, int>>>();
     
     private void OnEnable()
