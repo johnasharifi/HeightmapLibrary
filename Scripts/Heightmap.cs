@@ -70,7 +70,7 @@ public class Heightmap : MonoBehaviour
 
     private Dictionary<int, HashSet<Tuple<int, int>>> points = new Dictionary<int, HashSet<Tuple<int, int>>>();
     
-    private void Start()
+    private void OnEnable()
     {
         points[-1] = new HashSet<Tuple<int, int>>();
 
