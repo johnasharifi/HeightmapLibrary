@@ -32,6 +32,14 @@ public class Heightmap : MonoBehaviour
         return dim2;
     }
 
+    public IEnumerable<int> biomes
+    {
+        get
+        {
+            return points.Keys;
+        }
+    }
+
     /// <summary>
     /// Gets max dimension of map.
     /// </summary>
