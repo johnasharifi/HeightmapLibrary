@@ -14,24 +14,24 @@ public class BiomeToFloodfilledMesh : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        MeshIteration();
+        Dictionary<int, Mesh> meshes = GetMeshesFromHeightmap(map);
+        GetComponent<MeshFilter>().mesh = meshes[1];
     }
     
-    void MeshIteration()
+    public static Dictionary<int, Mesh> GetMeshesFromHeightmap(Heightmap heightmapWithBiomes)
     {
         // shared vars
         Dictionary<int, Mesh> meshes = new Dictionary<int, Mesh>();
-        int maxdim = map.getMaxDim();
+        int maxdim = heightmapWithBiomes.getMaxDim();
 
-        foreach (int biome in map.biomes)
-        // foreach (int biome in new[] { 1})
+        foreach (int biome in heightmapWithBiomes.biomes)
         {
             // per-mesh vars
             Mesh m = new Mesh();
             List<Vector3> verts0 = new List<Vector3>();
             List<int> tris0 = new List<int>();
 
-            foreach (Tuple<int,int> point in map[biome])
+            foreach (Tuple<int,int> point in heightmapWithBiomes[biome])
             {
                 if (!meshes.ContainsKey(biome) || meshes[biome] == null)
                 {
@@ -56,6 +56,6 @@ public class BiomeToFloodfilledMesh : MonoBehaviour
             meshes[biome] = m;
         }
 
-        GetComponent<MeshFilter>().mesh = meshes[1];
+        return meshes;
     }
 }
