@@ -2,7 +2,7 @@
 
 ## How to add this library to your Unity project
 
-<img src="https://github.com/johnasharifi/HeightmapLibrary/blob/feature_readme/DemoImages/Readme/HowToAddUnityPackageManager.png" height="256">
+<img src="https://github.com/johnasharifi/HeightmapLibrary/blob/master/DemoImages/Readme/HowToAddUnityPackageManager.png" height="256">
 
 - Acquire a remote or local repo of the Heightmap Library using git
 - Set up your Unity project, back it up
@@ -13,7 +13,7 @@
 
 ## How to use
 
-<img src="https://github.com/johnasharifi/HeightmapLibrary/blob/feature_readme/DemoImages/Readme/HeightmapComponent.png" height="256">
+<img src="https://github.com/johnasharifi/HeightmapLibrary/blob/master/DemoImages/Readme/HeightmapComponent.png" height="256">
 
 - Attach a Heightmap component to a gameObject
 - Set parameters for biome mapping, biome colors, and biome pathfinding
