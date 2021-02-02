@@ -68,6 +68,25 @@ public class Heightmap : MonoBehaviour
         }
     }
 
+    // quick and dirty implementation of a heights for the biomes in the heightmap
+    // TODO make serialized, not-hardcoded
+    public Dictionary<int, float> biomeVerticalOffsetTable
+    {
+        get
+        {
+            Dictionary<int, float> table = new Dictionary<int, float>();
+            foreach (int i in this.biomes)
+            {
+                table[i] = 0.0f;
+            }
+            // special cases: forests are +1, mountains are +2
+            table[0] = 2.0f;
+            table[9] = 2.0f;
+            table[8] = 1.0f;
+            return table;
+        }
+    }
+
     private Dictionary<int, HashSet<Tuple<int, int>>> points = new Dictionary<int, HashSet<Tuple<int, int>>>();
     
     private void OnEnable()
