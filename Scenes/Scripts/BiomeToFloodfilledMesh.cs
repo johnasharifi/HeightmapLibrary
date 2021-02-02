@@ -72,7 +72,7 @@ public class BiomeToFloodfilledMesh : MonoBehaviour
             List<Vector3> verts0 = new List<Vector3>();
             List<int> tris0 = new List<int>();
             
-            bool[,] visited = new bool[heightmapWithBiomes.getDim(0), heightmapWithBiomes.getDim(0)];
+            bool[,] visitedForConsolidation = new bool[heightmapWithBiomes.getDim(0), heightmapWithBiomes.getDim(0)];
             
             foreach (Tuple<int,int> point in heightmapWithBiomes[biome])
             {
@@ -81,13 +81,13 @@ public class BiomeToFloodfilledMesh : MonoBehaviour
                     meshes[biome] = new Mesh();
                 }
 
-                if (visited[point.Item1, point.Item2])
+                if (visitedForConsolidation[point.Item1, point.Item2])
                 {
                     // case: already in another bin. skip
                     continue;
                 }
                 
-                Tuple<int, int> spanPoint = spanPoint = ConsolidateFrom(point, heightmapWithBiomes[biome], visited);
+                Tuple<int, int> spanPoint = spanPoint = ConsolidateFrom(point, heightmapWithBiomes[biome], visitedForConsolidation);
                 
                 int lastInd = verts0.Count;
 
