@@ -82,11 +82,11 @@ public class Heightmap : MonoBehaviour
             // special cases: 
             // forests are +3, mountains are +6
             // deserts are -1, rivers are -3
-            table[0] = 6.0f;
-            table[9] = 6.0f;
-            table[8] = 3.0f;
-            table[7] = -1.0f;
-            table[5] = -3.0f;
+            table[0] = 2.0f;
+            table[9] = 2.0f;
+            table[8] = 1.0f;
+            table[7] = -0.5f;
+            table[5] = -1.0f;
             return table;
         }
     }
