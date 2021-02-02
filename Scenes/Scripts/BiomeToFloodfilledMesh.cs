@@ -93,12 +93,13 @@ public class BiomeToFloodfilledMesh : MonoBehaviour
 
                 Vector3 pOrig = new Vector3(point.Item1, point.Item2, 0);
                 Vector3 pTerm = new Vector3(spanPoint.Item1, spanPoint.Item2, 0);
-                
+
+                float vert = -1f * heightmapWithBiomes.biomeVerticalOffsetTable[biome];
                 verts0.AddRange(new Vector3[] {
-                    pOrig + new Vector3(-0.5f, -0.5f, 0.0f),
-                    new Vector3(pOrig.x, pTerm.y, 0.0f) + new Vector3(-0.5f, 0.5f, 0.0f),
-                    pTerm + new Vector3(0.5f, 0.5f, 0.0f) ,
-                    new Vector3(pTerm.x, pOrig.y, 0.0f) + new Vector3(0.5f, -0.5f, 0.0f) }
+                    pOrig + new Vector3(-0.5f, -0.5f, vert),
+                    new Vector3(pOrig.x, pTerm.y, 0.0f) + new Vector3(-0.5f, 0.5f, vert),
+                    pTerm + new Vector3(0.5f, 0.5f, vert) ,
+                    new Vector3(pTerm.x, pOrig.y, 0.0f) + new Vector3(0.5f, -0.5f, vert) }
                 );
                 tris0.AddRange(new int[] {lastInd + 0, lastInd + 1, lastInd + 2, lastInd + 0, lastInd + 2, lastInd + 3});
             }
