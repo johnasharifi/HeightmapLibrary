@@ -68,7 +68,7 @@ public class Heightmap : MonoBehaviour
         }
     }
 
-    // quick and dirty implementation of a heights for the biomes in the heightmap
+    // quick and dirty implementation of extrusions for the biomes in the heightmap
     // TODO make serialized, not-hardcoded
     public Dictionary<int, float> biomeVerticalOffsetTable
     {
