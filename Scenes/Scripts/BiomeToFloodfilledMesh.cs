@@ -113,8 +113,7 @@ public class BiomeToFloodfilledMesh : MonoBehaviour
                 int vertsInitialCount = verts0.Count;
                 for (int i = 0; i < vertsInitialCount - vertGroupCount; i = i + vertGroupCount)
                 {
-                    // we will always want to add a rect which has verts at i[0], i[1] to i[0] - vertOffset i[1] - vertOffset
-                    // don't need next 2 vertices
+                    // for left face we will always want to add a rect which has verts at i[0], i[1] to i[0] - vertOffset i[1] - vertOffset
                     Vector3 ind0 = verts0[i];
                     Vector3 ind1 = verts0[i + 1];
                     Vector3 ind0Flattened = new Vector3(ind0.x, ind0.y, 0.0f);
@@ -126,6 +125,21 @@ public class BiomeToFloodfilledMesh : MonoBehaviour
                         ind1,
                         ind0,
                         ind0Flattened,
+                    });
+                    tris0.AddRange(new int[] { lastInd + 0, lastInd + 1, lastInd + 2, lastInd + 0, lastInd + 2, lastInd + 3 });
+                    
+                    // for right face we will want to add rect which has verts at i[2], i[3] to i[2] - vertOffset, i[3] - vertOffset
+                    Vector3 ind2 = verts0[i + 2];
+                    Vector3 ind3 = verts0[i + 3];
+                    Vector3 ind2Flattened = new Vector3(ind2.x, ind2.y, 0.0f);
+                    Vector3 ind3Flattened = new Vector3(ind3.x, ind3.y, 0.0f);
+                    
+                    lastInd = verts0.Count; // cache ind before adding, so that our addition math is correct
+                    verts0.AddRange(new Vector3[] {
+                        ind3Flattened,
+                        ind3,
+                        ind2,
+                        ind2Flattened,
                     });
                     tris0.AddRange(new int[] { lastInd + 0, lastInd + 1, lastInd + 2, lastInd + 0, lastInd + 2, lastInd + 3 });
                 }
