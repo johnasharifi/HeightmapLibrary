@@ -64,6 +64,7 @@ public class BiomeToFloodfilledMesh : MonoBehaviour
         // shared vars
         Dictionary<int, Mesh> meshes = new Dictionary<int, Mesh>();
         int maxdim = heightmapWithBiomes.getMaxDim();
+        const int vertGroupCount = 4;
 
         foreach (int biome in heightmapWithBiomes.biomes)
         {
@@ -73,7 +74,9 @@ public class BiomeToFloodfilledMesh : MonoBehaviour
             List<int> tris0 = new List<int>();
             
             bool[,] visitedForConsolidation = new bool[heightmapWithBiomes.getDim(0), heightmapWithBiomes.getDim(0)];
-            
+            float verticalOffset = -1f * heightmapWithBiomes.biomeVerticalOffsetTable[biome];
+            bool isVerticallyOffset = !Mathf.Approximately(verticalOffset, 0.0f);
+
             foreach (Tuple<int,int> point in heightmapWithBiomes[biome])
             {
                 if (!meshes.ContainsKey(biome) || meshes[biome] == null)
@@ -94,7 +97,6 @@ public class BiomeToFloodfilledMesh : MonoBehaviour
                 Vector3 pOrig = new Vector3(point.Item1, point.Item2, 0);
                 Vector3 pTerm = new Vector3(spanPoint.Item1, spanPoint.Item2, 0);
 
-                float verticalOffset = -1f * heightmapWithBiomes.biomeVerticalOffsetTable[biome];
                 verts0.AddRange(new Vector3[] {
                     pOrig + new Vector3(-0.5f, -0.5f, verticalOffset),
                     new Vector3(pOrig.x, pTerm.y, 0.0f) + new Vector3(-0.5f, 0.5f, verticalOffset),
@@ -102,6 +104,31 @@ public class BiomeToFloodfilledMesh : MonoBehaviour
                     new Vector3(pTerm.x, pOrig.y, 0.0f) + new Vector3(0.5f, -0.5f, verticalOffset) }
                 );
                 tris0.AddRange(new int[] {lastInd + 0, lastInd + 1, lastInd + 2, lastInd + 0, lastInd + 2, lastInd + 3});
+            }
+
+            // additional step: when vertically offset, duplicate our verts and create a rect that spans from (xy, k) to (xy, 0)
+            if (isVerticallyOffset)
+            {
+                // acquire vert len now, iterate through the original verts only
+                int vertsInitialCount = verts0.Count;
+                for (int i = 0; i < vertsInitialCount - vertGroupCount; i = i + vertGroupCount)
+                {
+                    // we will always want to add a rect which has verts at i[0], i[1] to i[0] - vertOffset i[1] - vertOffset
+                    // don't need next 2 vertices
+                    Vector3 ind0 = verts0[i];
+                    Vector3 ind1 = verts0[i + 1];
+                    Vector3 ind0Flattened = new Vector3(ind0.x, ind0.y, 0.0f);
+                    Vector3 ind1Flattened = new Vector3(ind1.x, ind1.y, 0.0f);
+
+                    int lastInd = verts0.Count; // cache ind before adding, so that our addition math is correct
+                    verts0.AddRange(new Vector3[] {
+                        ind1Flattened,
+                        ind1,
+                        ind0,
+                        ind0Flattened,
+                    });
+                    tris0.AddRange(new int[] { lastInd + 0, lastInd + 1, lastInd + 2, lastInd + 0, lastInd + 2, lastInd + 3 });
+                }
             }
 
             m.SetVertices(verts0);
