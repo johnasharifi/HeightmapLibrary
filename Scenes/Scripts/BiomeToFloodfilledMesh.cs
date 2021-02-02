@@ -142,6 +142,31 @@ public class BiomeToFloodfilledMesh : MonoBehaviour
                         ind2Flattened,
                     });
                     tris0.AddRange(new int[] { lastInd + 0, lastInd + 1, lastInd + 2, lastInd + 0, lastInd + 2, lastInd + 3 });
+
+                    // TODO consolidate repeated code
+
+                    // for up face we will want to add rect which has verts at i[1], i[1] - vertOffset to i[2] - vertOffset, i[2]
+                    // need to correct for vert offset sign as well
+                    lastInd = verts0.Count; // cache ind before adding, so that our addition math is correct
+                    verts0.AddRange(new Vector3[] {
+                        ind1,
+                        ind1Flattened,
+                        ind2Flattened,
+                        ind2,
+                    });
+                    tris0.AddRange(new int[] { lastInd + 0, lastInd + 1, lastInd + 2, lastInd + 0, lastInd + 2, lastInd + 3 });
+
+                    // for up face we will want to add rect which has verts at i[3], i[3] - vertOffset to i[0] - vertOffset, i[0]
+                    // need to correct for vert offset sign as well
+                    lastInd = verts0.Count; // cache ind before adding, so that our addition math is correct
+                    verts0.AddRange(new Vector3[] {
+                        ind3,
+                        ind3Flattened,
+                        ind0Flattened,
+                        ind0,
+                    });
+                    tris0.AddRange(new int[] { lastInd + 0, lastInd + 1, lastInd + 2, lastInd + 0, lastInd + 2, lastInd + 3 });
+
                 }
             }
 
