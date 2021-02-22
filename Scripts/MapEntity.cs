@@ -15,6 +15,8 @@ public class MapEntity : MonoBehaviour
 
     private Vector3 spawnLocalPosition;
 
+    [SerializeField] MapEntityObjective m_Objective;
+
     private Collider myCollider;
     private Collider mapCollider;
     
